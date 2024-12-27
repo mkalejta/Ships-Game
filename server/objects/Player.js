@@ -1,10 +1,7 @@
 
 export default class Player {
     
-    constructor(nickname, password) {
+    constructor(nickname) {
         this.nickname = nickname
-        this.password = password
     }
-
-    // hashowanie hasła SHA256 do bazy danych
 }

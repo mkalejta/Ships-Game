@@ -5,12 +5,14 @@ import Player from './Player.js';
 
 export default class Game {
 
-    constructor(players) {
+    constructor(name, players) {
         this.id = uuidv4()
+        this.name = name
         this.board = new Board(this.id)
         this.players = players // [Player Object 1, ]
         this.ships = null
         this.winner = null
+        this.time = new Date().toLocaleString()
     }
 
     // funkcja joinGame()
