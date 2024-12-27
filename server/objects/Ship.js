@@ -4,5 +4,11 @@ export default class Ship {
         this.size = size
         this.start = start
         this.end = end
+        this.hits = []
+        this.sink = false
     }
+
+    // funkcja ifHit()
+
+    // funkcja ifSink()
 }
