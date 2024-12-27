@@ -1,13 +1,23 @@
 const { v4: uuidv4 } = require('uuid');
-import Board from board;
+import Board from './Board.js';
+import Ship from './Ship.js';
+import Player from './Player.js';
 
-class Game {
+export default class Game {
 
-    constructor(board, players) {
+    constructor(players) {
         this.id = uuidv4()
-        this.board = {}
-        this.players = []
+        this.board = new Board(this.id)
+        this.players = players // [Player Object 1, ]
         this.ships = null
         this.winner = null
     }
+
+    // funkcja joinGame()
+
+    // funkcja ifWinner()
+
+    // funkcja ifHit()
+
+    // funkcja ifSink()
 }

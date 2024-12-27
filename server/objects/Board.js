@@ -1,25 +1,23 @@
-import { v4 as uuidv4 } from 'uuid';
-import Ship from './Ship.js';
-
 const SIZE = 10;
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
-class Board {
+export default class Board {
     
-    constructor() {
-        this.id = uuidv4()
+    constructor(id) {
+        this.id = id
         this.size = SIZE
         this.board = this.build_board()
     }
     
     build_board() {
         let board = []
-        const row = [...Array(SIZE).keys()].map(_ => null)
-        for(let i = 0; i < this.size; i++) {
-            board[i] = row
-        }
+        LETTERS.forEach(letter => {
+            let row = [];
+            for (let i = 0; i < this.size; i++) {
+               row.push(letter + String(i+1));
+            }
+            board.push(row);
+        })
         return board;
     }
-}
-
-const newBoard = new Board();
-console.log(newBoard.board);
+};
