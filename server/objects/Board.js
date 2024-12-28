@@ -1,9 +1,15 @@
 const { v4: uuidv4 } = require('uuid');
 
 const SIZE = 10;
-const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
 export default class Board {
+
+    /*
+        OZNACZENIA NA PLANSZY
+        '0' - pudło
+        '1' - niesprawdzone
+        '2-5' - rodzaj statku
+    */
     
     constructor() {
         this.id = uuidv4()
@@ -14,13 +20,9 @@ export default class Board {
     
     build_board() {
         let board = []
-        LETTERS.forEach(letter => {
-            let row = [];
-            for (let i = 0; i < this.size; i++) {
-               row.push(letter + String(i+1));
-            }
-            board.push(row);
-        })
+        for (let i = 0; i < this.size; i++) {
+            board.push(Array(SIZE).fill('1'))
+        }
         return board;
     }
 
@@ -34,8 +36,11 @@ export default class Board {
         }
 
         this.ships.forEach(ship => {
-            ship.ifHit(move)
-            ship.ifSink(move)
+            if (ship.ifHit(move)) {
+                return;
+            }
         })
+
+        this.board[move[0]][move[1]] = "0"
     }
 };
