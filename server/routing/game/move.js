@@ -2,9 +2,10 @@ db = require("../../db")
 
 module.exports = (req, res) => {
     const move = req.body.move
+    const player = req.query.player
 
-    if (!move) {
-        res.status(400).json({ error: "There was not given any move!" })
+    if (!move || !player) {
+        res.status(400).json({ error: "Move and player have to be given!" })
         return;
     }
 
@@ -16,7 +17,7 @@ module.exports = (req, res) => {
         return;
     }
 
-    game.players.board["opponent"].make_move(move)
+    game.players[player].boards["opponent"].make_move(move)
 
     for(let i=0; i < data.length; i++) {
         if (data[i].id === req.params.id) {

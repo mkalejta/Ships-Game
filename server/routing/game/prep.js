@@ -1,0 +1,60 @@
+db = require("../../db")
+
+module.exports = (req, res) => {
+    const gameId = req.params.id
+    const player = req.query.player
+
+    if (!gameId || !player) {
+        res.status(400).json({ error: "Id and player have to be given!" })
+        return;
+    }
+
+    const data = db.getData("/games")
+    const game = data.find(g => g.id === g.params.id)
+
+    if (!game) {
+        res.status(404).json({ error: "Game was not found with given id! "})
+        return;
+    }
+
+    switch (req.method) {
+        case "PUT": // Zaznaczenie ułożenia statku
+            const ship = req.body.ship
+            if (!ship) {
+                res.status(400).json({ error: "Ship has to be given!" })
+                return;
+            }
+
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].id === req.params.id) {
+                    data[i].players[player].boards["self"].ships.push(ship)
+                    console.log(`${player} added ship with size ${ship.size}`)
+                    res.status(200).json(data[i])
+                }
+            }
+            db.push("/games", data)
+            break;
+
+        case "DELETE": // Wyczyszczenie ułożenia statków
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].id === req.params.id) {
+                    data[i].players[player].boards["self"].ships.clear()
+                    console.log(`${player}'s choices are cleared!`)
+                    res.status(200).json(data[i])
+                }
+            }
+            db.push("/games", data)
+            break;
+
+        case "POST": // Zatwierdzenie ułożenia statków 
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].id === req.params.id) {
+                    data[i].players[player].ready = true
+                    console.log(`${player} is ready`)
+                    res.status(200).json(data[i])
+                }
+            }
+            db.push("/games", data)
+            break;
+    }
+}

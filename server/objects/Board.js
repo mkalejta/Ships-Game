@@ -43,4 +43,13 @@ export default class Board {
 
         this.board[move[0]][move[1]] = "0"
     }
+
+    ifAllSink() {
+        this.ships.forEach(ship => {
+            if (!ship.sink) {
+                return false;
+            }
+        })
+        return true;
+    }
 };

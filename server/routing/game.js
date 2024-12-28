@@ -5,13 +5,13 @@ const prep = require("./game/prep")
 const view = require("./game/")
 const router = require("express").Router()
 
-router.post("/create", create) // POST - http://localhost:3000/game/create
-router.put("/:id/join", join) // PUT - http://localhost:3000/game/<game_id>/join
-router.put("/:id", move) // PUT - http://localhost:3000/game/<game_id>?move=""
-router.get("/:id", view) // GET - http://localhost:3000/game/<game_id>
+router.post("/create", create) // POST - http://localhost:3000/game/create?creator=Mikolaj&name=BitwaPodGdanskiem
+router.put("/:id/join", join) // PUT - http://localhost:3000/game/:gameId/join?joiner=Alek
+router.put("/:id", move) // PUT - http://localhost:3000/game/:gameId?player=Mikolaj   BODY = { move: {x: 3, y: 5} }
+router.get("/:id", view) // GET - http://localhost:3000/game/:gameId
 router.get("/", view) // GET - http://localhost:3000/game
-router.put("/:id/prep", prep) // PUT - http://localhost:3000/game/<game_id>/prep
-router.delete("/:id/prep", prep) // DELETE - http://localhost:3000/game/<game_id>/prep
-router.post("/:id/prep", prep) // POST - http://localhost:3000/game/<game_id>/prep
+router.put("/:id/prep", prep) // PUT - http://localhost:3000/game/:gameId/prep?player=Mikolaj   BODY = { ship: new Ship() }
+router.delete("/:id/prep", prep) // DELETE - http://localhost:3000/game/:gameId/prep?player=Mikolaj
+router.post("/:id/prep", prep) // POST - http://localhost:3000/game/:gameId/prep?player=Mikolaj
 
 module.exports = router

@@ -31,7 +31,7 @@ export default class Ship {
     }
 }
 
-class ShipPart {
+export class ShipPart {
     
     constructor(x, y) {
         this.x = x
