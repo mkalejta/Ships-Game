@@ -1,6 +1,7 @@
 db = require("../../db")
+const { Ship } = require("../../objects/Ship")
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
     const gameId = req.params.id
     const player = req.query.player
 
@@ -9,8 +10,8 @@ module.exports = (req, res) => {
         return;
     }
 
-    const data = db.getData("/games")
-    const game = data.find(g => g.id === g.params.id)
+    const data = await db.getData("/games")
+    const game = data.find(g => g.id === req.params.id)
 
     if (!game) {
         res.status(404).json({ error: "Game was not found with given id! "})
@@ -27,7 +28,7 @@ module.exports = (req, res) => {
 
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
-                    data[i].players[player].boards["self"].ships.push(ship)
+                    data[i].players[player].boards["self"].ships.push(new Ship(ship.size, ship.parts))
                     console.log(`${player} added ship with size ${ship.size}`)
                     res.status(200).json(data[i])
                 }

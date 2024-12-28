@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const game = data.find(g => g.id === g.params.id)
+    const game = data.find(g => g.id === req.params.id)
     if (!game) {
         res.status(404).json({ error: "Game was not found with given id! "})
         return;

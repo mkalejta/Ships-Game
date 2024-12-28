@@ -7,7 +7,7 @@ const PORT = 3000
 
 app.use(express.static(path.join(__dirname, "../client")))
 
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 
 app.use("/api", routing)
 

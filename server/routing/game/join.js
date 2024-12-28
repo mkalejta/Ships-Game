@@ -1,7 +1,7 @@
 const db = require("../../db")
 const Player = require("../../objects/Player")
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
     const joiner = req.query.joiner
 
     if (!joiner) {
@@ -9,7 +9,7 @@ module.exports = (req, res) => {
         return;
     }
 
-    let data = db.getData("/games")
+    let data = await db.getData("/games")
     const game = data.find(g => g.id === req.params.id)
 
     if (!game) {
@@ -17,7 +17,7 @@ module.exports = (req, res) => {
         return;
     }
 
-    if (game.players.length === 1) {
+    if (Object.keys(game.players).length === 1) {
         for (let i=0; i < data.length; i++) {
             if (data[i].id === req.params.id) {
                 data[i].players[joiner] = new Player(joiner)

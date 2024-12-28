@@ -1,4 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
+const { Ship, ShipPart } = require('./Ship.js');
+
 
 const SIZE = 10;
 

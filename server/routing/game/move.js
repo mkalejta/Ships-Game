@@ -1,6 +1,6 @@
 db = require("../../db")
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
     const move = req.body.move
     const player = req.query.player
 
@@ -9,7 +9,7 @@ module.exports = (req, res) => {
         return;
     }
 
-    const data = db.getData("/games")
+    const data = await db.getData("/games")
     const game = data.find(g => g.id === req.params.id)
 
     if (!game) {
@@ -17,7 +17,7 @@ module.exports = (req, res) => {
         return;
     }
 
-    game.players[player].boards["opponent"].make_move(move)
+    game.players[player].boards['opponent'].make_move(move)
 
     for(let i=0; i < data.length; i++) {
         if (data[i].id === req.params.id) {

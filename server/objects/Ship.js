@@ -1,10 +1,18 @@
 
-module.exports = [ class Ship {
+class Ship {
 
     constructor(size, parts) {
         this.size = size
-        this.parts = parts
+        this.parts = this.build_ship(parts)
         this.sink = false
+    }
+
+    build_ship(parts) {
+        let ships = []
+        parts.forEach(part => {
+            ships.push(new ShipPart(part.x, part.y))
+        });
+        return ships;
     }
 
     ifHit(move) {
@@ -29,7 +37,7 @@ module.exports = [ class Ship {
         this.sink = true
         return true;
     }
-},
+}
 
 class ShipPart {
     
@@ -42,4 +50,6 @@ class ShipPart {
     ifHit(move) {
         return this.x === move[0] && this.y === move[1];
     }
-}]
+}
+
+module.exports = { Ship, ShipPart }
