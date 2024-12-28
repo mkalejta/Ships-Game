@@ -1,11 +1,11 @@
 const { v4: uuidv4 } = require('uuid');
 
-export default class Game {
+module.exports = class Game {
 
     constructor(name, players) {
         this.id = uuidv4()
         this.name = name
-        this.players = players // { "player_name": Player Object 1, }
+        this.players = players // { playerName: Player Object 1, }
         this.winner = null
         this.time = new Date().toLocaleString()
     }

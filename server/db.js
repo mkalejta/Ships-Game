@@ -1,4 +1,3 @@
-const { JsonDB } = require("node-json-db")
-let db = new JsonDB("./database.json")
-
+const { JsonDB, Config } = require("node-json-db");
+var db = new JsonDB(new Config("./database.json"));
 module.exports = db

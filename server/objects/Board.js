@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const SIZE = 10;
 
-export default class Board {
+module.exports = class Board {
 
     /*
         OZNACZENIA NA PLANSZY
@@ -24,10 +24,6 @@ export default class Board {
             board.push(Array(SIZE).fill('1'))
         }
         return board;
-    }
-
-    add_ships(ships) {
-        // Po fazie przygotowań przekazuje statki na planszę
     }
 
     make_move(move) {

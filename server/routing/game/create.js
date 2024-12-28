@@ -1,6 +1,6 @@
 const db = require("../../db")
-import Game from "../../objects/Game"
-import Player from "../../objects/Player"
+const Game = require("../../objects/Game.js")
+const Player = require("../../objects/Player.js")
 
 module.exports = (req, res) => {
     const creator = req.query.creator

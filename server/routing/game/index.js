@@ -1,7 +1,7 @@
 const db = require("../../db")
 
-module.exports = (req, res) => {
-    const data = db.getData("/games")
+module.exports = async (req, res) => {
+    const data = await db.getData("/games");
 
     if (!req.params.id) {
         res.status(200).json(data) // Zwracane dane 'data' to lista wszystkich gier

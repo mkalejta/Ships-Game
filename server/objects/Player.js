@@ -1,6 +1,6 @@
-import Board from "./Board.js";
+const Board = require('./Board.js')
 
-export default class Player {
+module.exports = class Player {
     
     constructor(nickname) {
         this.nickname = nickname

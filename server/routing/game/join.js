@@ -1,5 +1,5 @@
 const db = require("../../db")
-import Player from "../../objects/Player"
+const Player = require("../../objects/Player")
 
 module.exports = (req, res) => {
     const joiner = req.query.joiner

@@ -1,5 +1,5 @@
 
-export default class Ship {
+module.exports = [ class Ship {
 
     constructor(size, parts) {
         this.size = size
@@ -29,9 +29,9 @@ export default class Ship {
         this.sink = true
         return true;
     }
-}
+},
 
-export class ShipPart {
+class ShipPart {
     
     constructor(x, y) {
         this.x = x
@@ -42,4 +42,4 @@ export class ShipPart {
     ifHit(move) {
         return this.x === move[0] && this.y === move[1];
     }
-}
+}]
