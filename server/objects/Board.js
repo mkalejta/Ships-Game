@@ -1,6 +1,4 @@
 const { v4: uuidv4 } = require('uuid');
-const { Ship, ShipPart } = require('./Ship.js');
-
 
 const SIZE = 10;
 
@@ -31,17 +29,27 @@ class Board {
         return board;
     }
 
+    add_ship(ship) {
+        for (let part of ship) {
+            this.board[part.position[0]][part.position[1]] = String(ship.size);
+        }
+    }
+
     make_move(move) {
-        this.ships.forEach(ship => {
+        for (let i=0; i < this.ships.length; i++) {
+            let ship = this.ships[i]
             if (ship.ifHit(move)) {
-                this.board[move.x][move.y] = String(ship.size)
+                this.board[move[1]][move[0]] = String(ship.size)
+                if (ship.sink) {
+                    console.log('Hit and Sink')
+                } else {
+                    console.log('Hit!')
+                }
                 return;
             }
-        })
-
-        this.board[move.x][move.y] = "0"
-        console.log("Miss...")
-        return;
+        }
+        this.board[move[0]][move[1]] = "0"
+        console.log("Miss...");
     }
 
     ifAllSink() {

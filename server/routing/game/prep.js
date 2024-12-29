@@ -1,5 +1,5 @@
 db = require("../../db")
-const { Ship } = require("../../objects/Ship")
+const Ship = require("../../objects/Ship")
 
 module.exports = async (req, res) => {
     const gameId = req.params.id
@@ -18,6 +18,8 @@ module.exports = async (req, res) => {
         return;
     }
 
+    const opponent = getOpponent(game, player)
+
     switch (req.method) {
         case "PUT": // Zaznaczenie ułożenia statku
             const ship = req.body.ship
@@ -28,8 +30,9 @@ module.exports = async (req, res) => {
 
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
-                    data[i].players[player].boards["self"].ships.push(new Ship(ship.size, ship.parts))
-                    console.log(`${player} added ship with size ${ship.size}`)
+                    data[i].players[player].boards["self"].ships.push(new Ship(ship.parts))
+                    data[i].players[opponent].boards['opponent'] = data[i].players[player].boards['self']
+                    console.log(`${player} added ship with size ${ship.parts.length}`)
                     res.status(200).json(data[i])
                 }
             }
@@ -40,6 +43,7 @@ module.exports = async (req, res) => {
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
                     data[i].players[player].boards["self"].ships = []
+                    data[i].players[opponent].boards['opponent'] = data[i].players[player].boards['self']
                     console.log(`${player}'s choices are cleared!`)
                     res.status(200).json(data[i])
                 }
@@ -47,12 +51,10 @@ module.exports = async (req, res) => {
             db.push("/games", data)
             break;
 
-        case "POST": // Zatwierdzenie ułożenia statków 
+        case "POST": // Zatwierdzenie ułożenia statków
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
                     data[i].players[player].ready = true
-                    const opponent = getOpponent(data[i], player)
-                    data[i].players[opponent].boards['opponent'] = data[i].players[player].boards['self']
                     console.log(`${player} is ready`)
                     res.status(200).json(data[i])
                 }
