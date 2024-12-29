@@ -1,4 +1,6 @@
 db = require("../../db")
+const Board = require("../../objects/Board.js")
+const { Ship, ShipPart } = require("../../objects/Ship.js")
 
 module.exports = async (req, res) => {
     const move = req.body.move
@@ -17,12 +19,18 @@ module.exports = async (req, res) => {
         return;
     }
 
-    game.players[player].boards['opponent'].make_move(move)
+    game.players[player].boards['opponent'] = Object.assign(new Board(), game.players[player].boards['opponent']);
+    game.players[player].boards['opponent'].ships = game.players[player].boards['opponent'].ships.map(ship => ship = Object.assign(new Ship(), ship));
+    game.players[player].boards['opponent'].ships.forEach(ship => {
+        ship.parts.map(part => part = Object.assign(new ShipPart(), part));
+    });
+    game.players[player].boards['opponent'].make_move(move);
 
     for(let i=0; i < data.length; i++) {
         if (data[i].id === req.params.id) {
             data[i] = game
-            console.log(`${player}: ${move}`)
+            console.log(`${player}: ${move.x} ${move.y}`)
+            res.status(200).json(data[i])
         }
     }
 

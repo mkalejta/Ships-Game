@@ -4,7 +4,7 @@ const { Ship, ShipPart } = require('./Ship.js');
 
 const SIZE = 10;
 
-module.exports = class Board {
+class Board {
 
     /*
         OZNACZENIA NA PLANSZY
@@ -13,11 +13,14 @@ module.exports = class Board {
         '2-5' - rodzaj statku
     */
     
-    constructor() {
+    constructor(data) {
         this.id = uuidv4()
         this.size = SIZE
         this.board = this.build_board()
         this.ships = []
+        if (data) {
+            Object.assign(this, data);
+        }
     }
     
     build_board() {
@@ -29,17 +32,16 @@ module.exports = class Board {
     }
 
     make_move(move) {
-        if (!move) {
-            return;
-        }
-
         this.ships.forEach(ship => {
             if (ship.ifHit(move)) {
+                this.board[move.x][move.y] = String(ship.size)
                 return;
             }
         })
 
-        this.board[move[0]][move[1]] = "0"
+        this.board[move.x][move.y] = "0"
+        console.log("Miss...")
+        return;
     }
 
     ifAllSink() {
@@ -51,3 +53,5 @@ module.exports = class Board {
         return true;
     }
 };
+
+module.exports = Board

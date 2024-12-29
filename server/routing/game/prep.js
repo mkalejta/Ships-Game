@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
         case "DELETE": // Wyczyszczenie ułożenia statków
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
-                    data[i].players[player].boards["self"].ships.clear()
+                    data[i].players[player].boards["self"].ships = []
                     console.log(`${player}'s choices are cleared!`)
                     res.status(200).json(data[i])
                 }
@@ -51,6 +51,8 @@ module.exports = async (req, res) => {
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
                     data[i].players[player].ready = true
+                    const opponent = getOpponent(data[i], player)
+                    data[i].players[opponent].boards['opponent'] = data[i].players[player].boards['self']
                     console.log(`${player} is ready`)
                     res.status(200).json(data[i])
                 }
@@ -58,4 +60,9 @@ module.exports = async (req, res) => {
             db.push("/games", data)
             break;
     }
+}
+
+function getOpponent(game, player) {
+    let opponent = Object.keys(game.players).filter(name => name !== player)[0]
+    return opponent;
 }

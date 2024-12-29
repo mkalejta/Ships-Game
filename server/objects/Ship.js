@@ -3,23 +3,23 @@ class Ship {
 
     constructor(size, parts) {
         this.size = size
-        this.parts = this.build_ship(parts)
+        this.parts = [];
+        if (parts) {
+            this.build_ship(parts);
+        }
         this.sink = false
     }
 
     build_ship(parts) {
-        let ships = []
         parts.forEach(part => {
-            ships.push(new ShipPart(part.x, part.y))
+            this.parts.push(new ShipPart(part.x, part.y))
         });
-        return ships;
     }
 
     ifHit(move) {
-        for (part in this.parts) {
+        for (let part in this.parts) {
             if (part.ifHit(move)) {
-                console.log('Ship was hit')
-                part.hit = true
+                console.log('Ship was hit!')
                 ifSink();
                 return true;
             }
@@ -28,7 +28,7 @@ class Ship {
     }
 
     ifSink() {
-        for (part in this.parts) {
+        for (let part in this.parts) {
             if (part.hit === false) {
                 return false;
             }
@@ -41,14 +41,21 @@ class Ship {
 
 class ShipPart {
     
-    constructor(x, y) {
+    constructor(x, y, data) {
         this.x = x
         this.y = y
         this.hit = false
+        if (data) {
+            Object.assign(this, data);
+        }
     }
 
     ifHit(move) {
-        return this.x === move[0] && this.y === move[1];
+        if (this.x === move.x && this.y === move.y) {
+            this.hit = true
+            return true;
+        }
+        return false;
     }
 }
 

@@ -157,7 +157,7 @@
                             ]
                         },
                         "opponent": {
-                            "id": "b07ef8ac-3dc8-4f80-872f-468baef440b8",
+                            "id": "086df5ed-ec87-4a13-b92b-fbab811ed5e5",
                             "size": 10,
                             "board": [
                                 [
@@ -284,7 +284,7 @@
                             "ships": []
                         }
                     },
-                    "ready": false
+                    "ready": true
                 },
                 "Alek": {
                     "nickname": "Alek",
@@ -417,7 +417,7 @@
                             "ships": []
                         },
                         "opponent": {
-                            "id": "67abab70-6a57-4474-9a22-dd0be329b47d",
+                            "id": "367e6c94-e742-41f4-81f5-c11d1639e4db",
                             "size": 10,
                             "board": [
                                 [
@@ -541,7 +541,29 @@
                                     "1"
                                 ]
                             ],
-                            "ships": []
+                            "ships": [
+                                {
+                                    "size": 3,
+                                    "parts": [
+                                        {
+                                            "x": 2,
+                                            "y": 0,
+                                            "hit": false
+                                        },
+                                        {
+                                            "x": 3,
+                                            "y": 0,
+                                            "hit": false
+                                        },
+                                        {
+                                            "x": 4,
+                                            "y": 0,
+                                            "hit": false
+                                        }
+                                    ],
+                                    "sink": false
+                                }
+                            ]
                         }
                     },
                     "ready": false
