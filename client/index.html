@@ -13,26 +13,24 @@
             font-weight: bold;
         }
 
-        nav .navbar-brand {
+        nav .logo {
             color: blue;
             text-transform: uppercase;
             letter-spacing: 4px;
         }
 
-        main .row {
-            gap: 2rem;
+        .card {
+            width: 100%;
+            height: 250px;
+            margin: 3rem auto;
         }
 
-        .card {
-            width: 300px;
-            height: 300px;
-        }
     </style>
 </head>
 <body>
     <nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid p-2-inline">
-            <a class="navbar-brand" href="#">Ships Game</a>
+            <div class="logo">Ships Game</div>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mx-auto d-flex justify-content-between" style="width: 300px;">
                     <li class="nav-item">
@@ -52,45 +50,55 @@
                     </li>
                 </ul>
             </div>
-            <button class="btn btn-success" type="button">Log In</button>
+            <button class="btn btn-success" type="button" style="font-weight: bold;">Log In</button>
         </div>
     </nav>
     <main>
         <div class="container-fluid text-center">
-            <div class="row flex-wrap mx-auto p-2">
-                <div class="card">
-                    <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+            <br>
+            <div class="container">
+                <button type="button" class="btn btn-primary" style="font-weight: bold; font-size: 1.25rem;">Create new game</button>
+            </div>
+            <div class="row flex-wrap mx-auto">
+                <div class="col">
+                    <div class="card border-4 border-info-subtle">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h5 class="card-title">Game ID</h5>
+                        <p class="card-text">Creator: Creator's Name</p>
+                        <a href="#" class="btn btn-outline-primary">Join game</a>
+                        </div>
+                    </div>
+                    <div class="card border-4 border-info-subtle">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h5 class="card-title">Game ID</h5>
+                        <p class="card-text">Creator: Creator's Name</p>
+                        <a href="#" class="btn btn-outline-primary">Join game</a>
+                        </div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                <div class="col">
+                    <div class="card border-4 border-info-subtle">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h5 class="card-title">Game ID</h5>
+                        <p class="card-text">Creator: Creator's Name</p>
+                        <a href="#" class="btn btn-outline-primary">Join game</a>
+                        </div>
+                    </div>
+                    <div class="card border-4 border-info-subtle">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h5 class="card-title">Game ID</h5>
+                        <p class="card-text">Creator: Creator's Name</p>
+                        <a href="#" class="btn btn-outline-primary">Join game</a>
+                        </div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                <div class="col">
+                    <div class="card border-4 border-info-subtle">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h5 class="card-title">Game ID</h5>
+                        <p class="card-text">Creator: Creator's Name</p>
+                        <a href="#" class="btn btn-outline-primary">Join game</a>
+                        </div>
                     </div>
                 </div>
             </div>
