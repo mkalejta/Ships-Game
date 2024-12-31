@@ -16,9 +16,9 @@ let API = {
         return this.api.put(`/game/${id}/join?joiner=${joiner}`)
         .then(response => response.data)
     },
-    makePrepChoice: function(player, id, ship) {
-        return this.api.put(`/game/${id}/prep?player=${player}`,
-            new URLSearchParams({ ship })).then(response => response.data)
+    makePrepChoice: function(player, id, parts) {
+        return this.api.put(`/game/${id}/prep?player=${player}`, parts)
+        .then(response => response.data)
     },
     clearPrepChoices: function(player, id) {
         return this.api.delete(`/game/${id}/prep?player=${player}`)
@@ -29,7 +29,7 @@ let API = {
         .then(response => response.data)
     },
     makeMove: function(player, id, move) {
-        return this.api.put(`/game/${id}?player=${player}`,
-            new URLSearchParams({ move })).then(response => response.data)
+        return this.api.put(`/game/${id}?player=${player}`, move)
+        .then(response => response.data)
     }
 }
