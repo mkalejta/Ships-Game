@@ -22,17 +22,17 @@ module.exports = async (req, res) => {
 
     switch (req.method) {
         case "PUT": // Zaznaczenie ułożenia statku
-            const ship = req.body.ship
-            if (!ship) {
+            const parts = req.body.parts
+            if (!parts) {
                 res.status(400).json({ error: "Ship has to be given!" })
                 return;
             }
 
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
-                    data[i].players[player].boards["self"].ships.push(new Ship(ship.parts))
+                    data[i].players[player].boards["self"].ships.push(new Ship(parts))
                     data[i].players[opponent].boards['opponent'] = data[i].players[player].boards['self']
-                    console.log(`${player} added ship with size ${ship.parts.length}`)
+                    console.log(`${player} added ship with size ${parts.length}`)
                     res.status(200).json(data[i])
                 }
             }
