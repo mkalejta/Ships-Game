@@ -8,8 +8,8 @@ let API = {
         return this.api.get(`/game/`)
             .then(response => response.data)
     },
-    createGame: function(creator, name) {
-        return this.api.post(`/game/create?creator=${creator}&name=${name}`)
+    createGame: function() {
+        return this.api.post(`/game/create`)
         .then(response => response.data)
     },
     joinGame: function(joiner, id) {

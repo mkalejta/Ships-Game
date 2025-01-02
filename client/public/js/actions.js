@@ -1,11 +1,8 @@
-const { RedirectHandler } = require("undici-types")
-
 let actions = {
     createGame: function() {
         const inputs = utils.promptUser(["Name: ", "Game name: "])
         if (inputs.every(e => e)) {
-            API.createGame(...inputs).then(response => {
-                alert("Created game successfully!")
+            API.createGame(...inputs).then((res) => {
                 this.refreshGames()
             }).catch(alert)
         } else {

@@ -1,0 +1,85 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 40px);
+    grid-template-rows: repeat(10, 40px);
+    gap: 2px;
+    background-color: #ddd;
+    padding: 5px;
+}
+
+.board div {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.board div:hover {
+    background-color: #e0e0e0;
+}
+
+.info {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.info h3 {
+    margin: 0 0 10px;
+}
+
+.info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+.info ul li {
+    margin-bottom: 5px;
+}
+
+.info button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.info button:hover {
+    background-color: #0056b3;
+}
+
+.info button:last-child {
+    background-color: #28a745;
+}
+
+.info button:last-child:hover {
+    background-color: #218838;
+}

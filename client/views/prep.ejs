@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/prep.css">
+    <title>Battleship Game</title>
+</head>
+<body>
+    <div class="container">
+        <div class="board">
+            <% for (let i = 0; i < 10; i++) { %>
+                <% for (let j = 0; j < 10; j++) { %>
+                    <div data-row="<%= i %>" data-col="<%= j %>"></div>
+                <% } %>
+            <% } %>
+        </div>
+
+        <div class="info">
+            <h3>Available Ships</h3>
+            <ul>
+                <li>1 x 5-cell ship</li>
+                <li>2 x 4-cell ships</li>
+                <li>2 x 3-cell ships</li>
+                <li>3 x 2-cell ships</li>
+            </ul>
+            <button id="clear">Clear</button>
+            <button id="confirm">Confirm</button>
+        </div>
+    </div>
+</body>
+</html>

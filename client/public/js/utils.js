@@ -14,9 +14,11 @@ let utils = {
                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                 <h5 class="card-title">${name}</h5>
                 <p class="card-text">Players: ${Object.values(players).map(p => " " + p.nickname)}</p>
-                <button onclick="actions.joinGame('${id}')" class="btn btn-outline-primary">Join game</button>
+                <a href="/game/${id}/prep">
+                    <button onclick="actions.joinGame('${id}')" class="btn btn-outline-primary">Join game</button>
+                </a>
                 </div>
             </div>
         </div>`
-    } 
+    }
 }

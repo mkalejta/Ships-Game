@@ -4,38 +4,40 @@ const bodyParser = require('body-parser');
 const routing = require("./routing");
 const app = express();
 const PORT = 3000;
-const viewsPath = path.join(__dirname, "../client/views");
 
-app.use(express.static(path.join(__dirname, "../client")));
+// Ustawienia widoków
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "../client/views"));
+
+app.use(express.urlencoded({ extended: true }))
 
 app.use(bodyParser.json());
 
 app.use("/api", routing);
 
-// Domyślna trasa
 app.get('/', (req, res) => {
-    res.sendFile(path.join(viewsPath, "home.html"))
+    res.render("home.ejs");
 });
 
 app.get('/game', (req, res) => {
-    res.sendFile(path.join(viewsPath, "games.html"))
+    res.render("games.ejs");
+})
+
+app.get('/game/create', (req, res) => {
+    res.render("createGame.ejs");
 })
 
 app.get('/game/:id', (req, res) => {
-    res.sendFile(path.join(viewsPath, "game.html"))
+    res.render("game.ejs");
 })
 
-app.post('/game/:id', (req, res) => {
-    res.redirect(path.join(viewsPath, "prep.html"))
+app.get('/game/:id/prep', (req, res) => {
+    res.render("prep.ejs");
 })
 
-app.put('/game/:id', (req, res) => {
-    res.redirect(path.join(viewsPath, "prep.html"))
-})
 
-app.post('/game/:id/prep', (req, res) => {
-    res.redirect(path.join(viewsPath, "game.html"))
-})
+
+app.use(express.static(path.join(__dirname, "../client/public")));
 
 app.listen(PORT, () => {
     console.log(`Backend listens on port ${PORT}`);
