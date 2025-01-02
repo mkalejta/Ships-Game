@@ -1,3 +1,5 @@
+const { RedirectHandler } = require("undici-types")
+
 let actions = {
     createGame: function() {
         const inputs = utils.promptUser(["Name: ", "Game name: "])
