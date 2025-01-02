@@ -4,7 +4,7 @@ const Player = require("../../objects/Player")
 module.exports = async (req, res) => {
     const joiner = req.query.joiner
 
-    if (!joiner) {
+    if (!joiner || joiner === 'null') {
         res.status(400).json({ error: "Joiner's name is needed!" })
         return;
     }
