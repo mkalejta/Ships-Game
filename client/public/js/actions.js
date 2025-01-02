@@ -21,7 +21,14 @@ let actions = {
         API.joinGame(...utils.promptUser(["Name: "]), id)
             .then((response) => {
                 this.refreshGames()
-                alert(`${Object.keys(response.players)[1]} joined ${response.name}.`)
             }).catch(alert)
+    },
+    refreshBoard: function (player, id) {
+        
+    },
+    makePrepChoice: function(player, id, parts) {
+        API.makePrepChoice(player, id, parts).then((res) => {
+            // this.refreshBoard()
+        })
     }
 }

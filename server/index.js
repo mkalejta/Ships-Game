@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const routing = require("./routing");
+const middleware = require("./routing/middleware")
 const app = express();
 const PORT = 3000;
 
@@ -9,11 +10,12 @@ const PORT = 3000;
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../client/views"));
 
-app.use(express.urlencoded({ extended: true }))
+app.use(express.static(path.join(__dirname, "../client/public")));
 
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }))
 
-app.use("/api", routing);
+app.use("/api", middleware, routing);
 
 app.get('/', (req, res) => {
     res.render("home.ejs");
@@ -34,10 +36,6 @@ app.get('/game/:id', (req, res) => {
 app.get('/game/:id/prep', (req, res) => {
     res.render("prep.ejs");
 })
-
-
-
-app.use(express.static(path.join(__dirname, "../client/public")));
 
 app.listen(PORT, () => {
     console.log(`Backend listens on port ${PORT}`);

@@ -11,22 +11,117 @@
         <div class="board">
             <% for (let i = 0; i < 10; i++) { %>
                 <% for (let j = 0; j < 10; j++) { %>
-                    <div data-row="<%= i %>" data-col="<%= j %>"></div>
+                    <div onclick="addCurrentChoice(i, j)" data-row="<%= i %>" data-col="<%= j %>"></div>
                 <% } %>
             <% } %>
         </div>
 
         <div class="info">
             <h3>Available Ships</h3>
-            <ul>
-                <li>1 x 5-cell ship</li>
-                <li>2 x 4-cell ships</li>
-                <li>2 x 3-cell ships</li>
-                <li>3 x 2-cell ships</li>
+            <ul id="ship-list">
+                <% for (let size of [2, 2, 2, 2, 3, 3, 4, 4, 5]) { %>
+                    <li><%= size %></li>
+                <% } %>
             </ul>
             <button id="clear">Clear</button>
             <button id="confirm">Confirm</button>
         </div>
     </div>
+    <script src="/js/API.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/actions.js"></script>
+    <script>
+        let choices = [];
+        let currentChoice = [];
+        let shipSizes = [2, 2, 2, 2, 3, 3, 4, 4, 5];
+        let parts = [];
+        
+        function addCurrentChoice(row, col) {
+            currentChoice.push([row, col])
+        }
+
+        function checkIfChoiceDone() {
+            return currentChoice.length === 2
+        }
+
+        function clearCurrentChoices() {
+            currentChoice = [];
+        }
+
+        function makeShipParts(start, end) {
+            if (start[0] === end[0]) {
+                // ruch poziomy
+                for (let i = Math.min(start[1], end[1]); i <= Math.max(start[1], end[1]); i++) {
+                    parts.push([start[0], i]);
+                }
+            } else if (start[1] === end[1]) {
+                // Ruch pionowy
+                for (let i = Math.min(start[0], end[0]); i <= Math.max(start[0], end[0]); i++) {
+                    parts.push([i, start[1]]);
+                }
+            }
+        }
+
+        function checkIfChoiceCorrect(start, end) {
+            const dist =
+                start[0] === end[0]
+                    ? Math.abs(end[1] - start[1])
+                    : start[1] === end[1]
+                    ? Math.abs(end[0] - start[0])
+                    : 0;
+
+            return shipSizes.includes(dist);
+        }
+
+        function crossOutShip() {
+            for (let size of shipSizes) {
+                if (parts.length === size) {
+                    const index = shipSize.indexOf(size)
+                    shipSizes.splice(index, 1)
+                    return;
+                }
+            }
+        }
+
+        function toggleCellSelection(row, col) {
+            const cell = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
+            cell.classList.toggle('selected');
+        }
+
+        function addCurrentChoice(row, col) {
+            currentChoice.push([row, col]);
+            toggleCellSelection(row, col);
+        }
+
+        document.querySelectorAll('.board div').forEach(field => field.addEventListener('click', () => {
+            if (!field.classList.contains('selected')) {
+                field.classList.add('selected');
+            }
+        }))
+
+        document.getElementById('clear').addEventListener('click', () => {
+            currentChoice = [];
+            parts = [];
+            document.querySelectorAll('.board div').forEach(cell => cell.classList.remove('selected'));
+        });
+
+        document.getElementById('confirm').addEventListener('click', () => {
+            if (currentChoice.length === 2) {
+                const [start, end] = currentChoice;
+
+                if (checkIfChoiceCorrect(start, end)) {
+                    makeShipParts(start, end);
+                    crossOutShip();
+                    alert('Ship placed!');
+                } else {
+                    alert('Invalid ship placement!');
+                }
+
+                currentChoice = [];
+            } else {
+                alert('Select two points first!');
+            }
+        });
+    </script>
 </body>
 </html>

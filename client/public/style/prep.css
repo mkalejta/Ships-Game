@@ -83,3 +83,7 @@ body {
 .info button:last-child:hover {
     background-color: #218838;
 }
+
+.board div.selected {
+    background-color: red;
+}
