@@ -18,19 +18,23 @@ let actions = {
         }).catch(alert)
     },
     joinGame: function (id) {
-        API.joinGame(...utils.promptUser(["Name: "]), id)
-            .then((response) => {
-                this.refreshGames()
-            }).catch(alert)
-    },
-    refreshBoard: function (player, id) {
-        
+        API.joinGame(...utils.promptUser(["Name: "]), id).then((res) => {
+            this.refreshGames()
+        }).catch(alert)
     },
     makePrepChoice: function(player, id, parts) {
         API.makePrepChoice(player, id, parts).then((res) => {
-            // refreshBoard()
             console.log(res);
-            alert('Ship was added!')
-        })
+        }).catch(alert)
+    },
+    prepClear: function(player, id) {
+        API.clearPrepChoices(player, id).then((res) => {
+            console.log(res);
+        }).catch(alert);
+    },
+    prepConfirm: function(player, id) {
+        API.confirmPrepChoices(player, id).then((res) => {
+            console.log(res);
+        }).catch(alert)
     }
 }

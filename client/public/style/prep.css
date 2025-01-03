@@ -99,3 +99,16 @@ body {
 .board div.selected {
     background-color: red;
 }
+
+.board div.ship {
+    background-color: grey;
+    pointer-events: none;
+}
+
+.board div.all-placed {
+    pointer-events: none;
+}
+
+.board div.confirmed {
+    background-color: #25c9ff;
+}
