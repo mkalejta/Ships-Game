@@ -72,8 +72,20 @@ body {
     cursor: pointer;
 }
 
+.info ul#ship-list {
+    column-count: 3;
+}
+
+.info button:nth-of-type(2) {
+    background-color: red;
+}
+
 .info button:hover {
     background-color: #0056b3;
+}
+
+.info button:nth-of-type(2):hover {
+    background-color: #900000;
 }
 
 .info button:last-child {

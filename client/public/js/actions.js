@@ -28,7 +28,9 @@ let actions = {
     },
     makePrepChoice: function(player, id, parts) {
         API.makePrepChoice(player, id, parts).then((res) => {
-            // this.refreshBoard()
+            // refreshBoard()
+            console.log(res);
+            alert('Ship was added!')
         })
     }
 }
