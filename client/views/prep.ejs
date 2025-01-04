@@ -8,7 +8,18 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
+    <h1>Preparation Phase</h1>
     <div class="container">
+        <div class="numbers">
+            <% for (let i = 0; i < 10; i++) { %>
+                <div><%= i %></div>
+            <% } %>
+        </div>
+        <div class="letters">
+            <% for (let letter of ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']) { %>
+                <div><%= letter %></div>
+            <% } %>
+        </div>
         <div class="board">
             <% for (let i = 0; i < 10; i++) { %>
                 <% for (let j = 0; j < 10; j++) { %>
@@ -38,7 +49,7 @@
         let Info = document.getElementsByClassName('info')[0];
 
         let startShipSizes = [2, 2, 2, 3, 3, 4];
-        let currentShipSizes = [];
+        let currentShipSizes = [...startShipSizes];
         let parts = [];
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -62,7 +73,7 @@
             } else if (cols.every(col => col === cols[0])) {      
                 dist = Math.abs(Math.min(...rows) - Math.max(...rows))
             }
-            return dist+1;
+            return (dist+1 === parts.length) ? dist+1 : 0;
         }
 
         function crossOutShip() {
@@ -80,11 +91,53 @@
             toggleCellSelection(row, col);
         }
 
+        function sortParts() {
+            parts.sort(([row1, col1], [row2, col2]) => {
+                if (row1 === row2) {
+                    return col1 - col2;
+                } else {
+                    return row1 - row2;
+                }
+            })
+        }
+
         function confirmShip() {
             parts.forEach(([row, col]) => {
                 const cell = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
                 cell.classList.add('ship')
                 cell.classList.remove('selected')
+            })
+        }
+
+        function checkCellsAround(row, col) {
+            const top = document.querySelector(`[data-row='${row-1}'][data-col='${col}']`);
+            const right = document.querySelector(`[data-row='${row}'][data-col='${col+1}']`);
+            const bottom = document.querySelector(`[data-row='${row+1}'][data-col='${col}']`);
+            const left = document.querySelector(`[data-row='${row}'][data-col='${col-1}']`);
+            const leftBottom = document.querySelector(`[data-row='${row+1}'][data-col='${col-1}']`);
+            const leftTop = document.querySelector(`[data-row='${row-1}'][data-col='${col-1}']`);
+            const rightBottom = document.querySelector(`[data-row='${row+1}'][data-col='${col+1}']`);
+            const rightTop = document.querySelector(`[data-row='${row-1}'][data-col='${col+1}']`);
+
+            const topCon = (top && top.classList.contains('ship'));
+            const rightCon = (right && right.classList.contains('ship'));
+            const bottomCon = (bottom && bottom.classList.contains('ship'));
+            const leftCon = (left && left.classList.contains('ship'));
+            const leftBottomCon = (leftBottom && leftBottom.classList.contains('ship'));
+            const leftTopCon = (leftTop && leftTop.classList.contains('ship'));
+            const rightBottomCon = (rightBottom && rightBottom.classList.contains('ship'));
+            const rightTopCon = (rightTop && rightTop.classList.contains('ship'));
+
+            return topCon || rightCon || bottomCon || leftCon || leftBottomCon || leftTopCon || rightBottomCon || rightTopCon;
+        }
+
+        function disableCellsAroundShip() {
+            Cells.forEach(cell => {
+                const row = Number(cell.attributes['data-row'].value);
+                const col = Number(cell.attributes['data-col'].value);
+                if (!cell.classList.contains('ship') && checkCellsAround(row, col)) {
+                    cell.classList.add('ship-aside');
+                }
             })
         }
 
@@ -106,47 +159,84 @@
         }
 
         function shipListRender() {
-            for (let ship of startShipSizes) {
+            for (let ship of new Set(startShipSizes)) {
                 let li = document.createElement("li")
-                let elem;
-                li.appendChild(document.createTextNode(ship))
+                let span = document.createElement("span")
+                span.innerHTML = `${startShipSizes.filter(s => s === ship).length} x `
+                let img = document.createElement("img")
+                img.height = 24
+                img.widht = 24
+                img.src = "https://img.icons8.com/ios/50/rounded-square.png"
+                img.alt = "rounded-square"
+                li.appendChild(span.cloneNode(true))
+                for (let i=0; i < ship; i++) {
+                    li.appendChild(img.cloneNode(true))
+                }
                 ShipList.appendChild(li)
-                elem += `<li>${ship}</li>`
-                currentShipSizes.push(ship)
             }
         }
 
         function shipListRefresh() {
             ShipList.innerHTML = "";
-            for (let ship of currentShipSizes) {
+            for (let ship of new Set(currentShipSizes)) {
                 let li = document.createElement("li")
-                let elem;
-                li.appendChild(document.createTextNode(ship))
+                let span = document.createElement("span")
+                span.innerHTML = `${currentShipSizes.filter(s => s === ship).length} x `
+                let img = document.createElement("img")
+                img.height = 24
+                img.widht = 24
+                img.src = "https://img.icons8.com/ios/50/rounded-square.png"
+                img.alt = "rounded-square"
+                li.appendChild(span.cloneNode(true))
+                for (let i=0; i < ship; i++) {
+                    li.appendChild(img.cloneNode(true))
+                }
                 ShipList.appendChild(li)
-                elem += `<li>${ship}</li>`
+            }
+        }
+
+        function toggleClearButton() {
+            if (currentShipSizes.length === startShipSizes.length && !ClearButton.classList.contains('disabled')) {
+                ClearButton.classList.add('disabled')
+            } else if (currentShipSizes.length < startShipSizes.length && ClearButton.classList.contains('disabled')) {
+                ClearButton.classList.remove('disabled')
+            }
+        }
+
+        function toggleConfirmButton() {
+            if (currentShipSizes.length !== 0 && !ConfirmButton.classList.contains('disabled')) {
+                ConfirmButton.classList.add('disabled')
+            } else if (currentShipSizes.length === 0 && ConfirmButton.classList.contains('disabled')) {
+                ConfirmButton.classList.remove('disabled')
             }
         }
 
         shipListRender();
+        toggleClearButton();
+        toggleConfirmButton();
 
         Cells.forEach(field => field.addEventListener('click', () => {
             if (!field.classList.contains('selected')) {
                 parts.push([field.attributes['data-row'].value, field.attributes['data-col'].value])
                 field.classList.add('selected')
             } else {
-                field.classList.remove("selected");
+                field.classList.remove("selected")
                 parts.splice(parts.indexOf([field.attributes['data-row'].value, field.attributes['data-col'].value]), 1)
             }
         }))
 
         AddButton.addEventListener('click', () => {
             if(currentShipSizes.includes(validateShip(parts))) {
+                sortParts();
                 confirmShip();
+                disableCellsAroundShip();
                 crossOutShip();
                 shipListRefresh();
                 allShipsPlaced();
                 actions.makePrepChoice(Player, Id, { parts })
                 parts = [];
+                toggleClearButton();
+                toggleConfirmButton();
             } else {
                 clearWrongChoice();
                 parts = [];
@@ -154,11 +244,13 @@
         })
 
         ClearButton.addEventListener('click', () => {
-            Cells.forEach(cell => cell.classList.remove('selected', 'ship', 'all-placed'));
+            Cells.forEach(cell => cell.classList=[]);
             actions.prepClear(Player, Id)
             parts = [];
             currentShipSizes = [...startShipSizes];
             shipListRefresh();
+            toggleClearButton();
+            toggleConfirmButton();
         });
 
         ConfirmButton.addEventListener('click', () => {
