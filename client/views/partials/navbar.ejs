@@ -1,0 +1,38 @@
+<style>
+    nav {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 2rem;
+    }
+
+    nav .logo {
+        color: blue;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+    }
+</style>
+<nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid p-2-inline">
+        <div class="logo">Ships Game</div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mx-auto d-flex justify-content-between" style="width: 300px;">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/game">Games</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Info
+                    </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Ranking</a></li>
+                    <li><a class="dropdown-item" href="#">Instructions</a></li>
+                </ul>
+                </li>
+            </ul>
+        </div>
+        <button class="btn btn-success" type="button" style="font-weight: bold;">Log In</button>
+    </div>
+</nav>

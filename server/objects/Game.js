@@ -11,13 +11,11 @@ module.exports = class Game {
     }
 
     ifWinner() {
-        this.players.reduce((acc, player) => {
-            acc[player.nickname] = player.boards["self"]
-            return acc;
-        }, {}).forEach((nick, board) => {
+        Object.entries(this.players).forEach(([nick, player]) => {
+            const board = player.boards["self"];
             if (board.ifAllSink()) {
-                this.winner = nick
-                console.log(`${nick} won the game!`)
+                this.winner = nick;
+                console.log(`${nick} won the game!`);
                 return true;
             }
         });
