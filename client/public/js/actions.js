@@ -17,11 +17,6 @@ let actions = {
             });
         }).catch(alert)
     },
-    joinGame: function (id) {
-        API.joinGame(...utils.promptUser(["Name: "]), id).then((res) => {
-            this.refreshGames()
-        }).catch(alert)
-    },
     makePrepChoice: function(player, id, parts) {
         API.makePrepChoice(player, id, parts).then((res) => {
             console.log(res);
@@ -36,5 +31,15 @@ let actions = {
         API.confirmPrepChoices(player, id).then((res) => {
             console.log(res);
         }).catch(alert)
+    },
+    gameState: function(id) {
+        return API.getGame(id).then((res) => {
+            return {...res};
+        }).catch(alert);
+    },
+    makeMove: function(player, id, move) {
+        API.makeMove(player, id, move).then((res) => {
+            console.log(res);
+        }).catch(alert);
     }
 }

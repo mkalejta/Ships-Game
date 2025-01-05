@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const opponent = getOpponent(game, player)
+    const opponent = getOpponent(game, player);
 
     switch (req.method) {
         case "PUT": // Zaznaczenie ułożenia statku

@@ -23,11 +23,15 @@ module.exports = async (req, res) => {
                 data[i].players[joiner] = new Player(joiner)
                 data[i].time = new Date().toLocaleString()
                 console.log(`${joiner} has joined a game ${data[i].name}`)
-                res.status(200).json(data[i])
             }
         }
-        db.push("/games", data) // Aktualizacja bazy danych o polu 'games'
-        return;
+        try {
+            db.push("/games", data) // Aktualizacja bazy danych o polu 'games'
+            res.redirect(`/game/${game.id}/prep?player=${joiner}`)
+        } catch (error) {
+            console.error("Error saving game to DB: ", error)
+            return res.status(500).json({ error: "Failed to save game to DB" });
+        }
     } else {
         res.status(400).json({ error: "Game is already full of players!" })
         return;

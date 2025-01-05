@@ -1,0 +1,142 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    gap: 10rem;
+    background-color: #f0f0f0;
+}
+
+.container {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.container h2 {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.numbers, .letters {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 5px;
+}
+
+.numbers {
+    width: 318px;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+}
+
+.letters {
+    height: 318px;
+    position: absolute;
+    flex-direction: column;
+    right: 100%;
+}
+
+.numbers div, .letters div {
+    height: 30px;
+    width: 30px;
+    background-color:#cde2fe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 30px);
+    grid-template-rows: repeat(10, 30px);
+    position: relative;
+    gap: 2px;
+    background-color: #ddd;
+    padding: 5px;
+}
+
+.board h2 {
+    width: 100%;
+    text-align: center;
+}
+
+.board div {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.board div:hover {
+    background-color: #e0e0e0;
+}
+
+.info {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.info h3 {
+    margin: 0 0 10px;
+}
+
+.info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+.info ul li {
+    margin-bottom: 5px;
+}
+
+.info ul#ship-list {
+    column-count: 1;
+}
+
+.info ul#ship-list li {
+    display: flex;
+    align-items: center;
+    padding-inline: 0.5rem;
+}
+
+.info ul#ship-list li span {
+    margin-right: 0.5rem;
+}
+
+.board div.miss {
+    background-color: red;
+    pointer-events: none;
+}
+
+.board div.ship {
+    background-color: grey;
+    pointer-events: none;
+}
+
+.board div.all-placed {
+    pointer-events: none;
+}
+
+.board div.confirmed {
+    background-color: #25c9ff;
+}
