@@ -59,6 +59,7 @@
     <script>
         let ShipList = document.getElementById('ship-list');
         let Cells = document.querySelectorAll('[name=opponent-board] div');
+        let Cells2 = document.querySelectorAll('[name=your-board] div');
         let ShipsOpponentSinked = [];
         let move = [];
 
@@ -66,17 +67,20 @@
         const Player = urlParams.get('player');
         let Id;
         let GameState;
+        let OpponentBoard;
+        let YourBoard;
 
         const fullUrl = window.location.href;
         const urlParts = fullUrl.split('/');
         const gameIndex = urlParts.indexOf('game');
         if (gameIndex !== -1 && urlParts[gameIndex + 1]) {
-            Id = urlParts[gameIndex + 1];
+            Id = urlParts[gameIndex + 1].split('?')[0];
         }
 
         async function refreshGameState() {
             GameState = await actions.gameState(Id);
-            console.log(GameState);
+            OpponentBoard = GameState.players[Player].boards["opponent"];
+            YourBoard = {...GameState}.players[Player].boards["self"].board;
         }
 
         function toggleCellSelection(row, col) {
@@ -111,9 +115,11 @@
         shipListRefresh();
         refreshGameState();
 
-        // Cells.forEach(field => field.addEventListener('click', () => {
-            
-        // }))
+        Cells.forEach(field => field.addEventListener('click', () => {
+            move = [field.attributes['data-row'].value, field.attributes['data-col'].value]
+            actions.makeMove(Player, Id, { move });
+            refreshGameState();
+        }))
 
     </script>
 </body>

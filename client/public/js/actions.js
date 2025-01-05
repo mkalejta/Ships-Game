@@ -38,6 +38,13 @@ let actions = {
         }).catch(alert)
     },
     gameState: function(id) {
-        API.getGame(id).then((res) => res).catch(alert);
+        return API.getGame(id).then((res) => {
+            return {...res};
+        }).catch(alert);
+    },
+    makeMove: function(player, id, move) {
+        API.makeMove(player, id, move).then((res) => {
+            console.log(res);
+        }).catch(alert);
     }
 }
