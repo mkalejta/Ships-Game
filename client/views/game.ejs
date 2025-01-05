@@ -79,18 +79,18 @@
 
         async function refreshGameState() {
             GameState = await actions.gameState(Id);
-            OpponentBoard = GameState.players[Player].boards["opponent"];
+            OpponentBoard = GameState.players[Player].boards["opponent"].board;
             YourBoard = {...GameState}.players[Player].boards["self"].board;
-        }
-
-        function toggleCellSelection(row, col) {
-            const cell = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
-            cell.classList.toggle('selected');
-        }
-
-        function addCurrentChoice(row, col) {
-            move = [row, col];
-            toggleCellSelection(row, col);
+            OpponentBoard.forEach((row, i) => {
+                row.forEach((field, j) => {
+                    const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
+                    if (field === '0') {
+                        cell.classList.add('miss');
+                    } else if (field !== '1') {
+                        cell.classList.add('ship');
+                    }
+                })
+            })
         }
 
         function shipListRefresh() {
@@ -116,7 +116,8 @@
         refreshGameState();
 
         Cells.forEach(field => field.addEventListener('click', () => {
-            move = [field.attributes['data-row'].value, field.attributes['data-col'].value]
+            const [ row, col ] = [field.attributes['data-row'].value, field.attributes['data-col'].value];
+            move = [ row, col ];
             actions.makeMove(Player, Id, { move });
             refreshGameState();
         }))

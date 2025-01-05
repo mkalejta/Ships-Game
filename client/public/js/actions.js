@@ -18,9 +18,14 @@ let actions = {
         }).catch(alert)
     },
     joinGame: function (id) {
-        API.joinGame(...utils.promptUser(["Name: "]), id).then((res) => {
-            this.refreshGames()
-        }).catch(alert)
+        const input = utils.promptUser(["Name: "]);
+        if (input) {
+            API.joinGame(...input, id).then((res) => {
+                this.refreshGames()
+            }).catch(alert)
+        } else {
+            alert("Please enter your nickname!")
+        }
     },
     makePrepChoice: function(player, id, parts) {
         API.makePrepChoice(player, id, parts).then((res) => {
