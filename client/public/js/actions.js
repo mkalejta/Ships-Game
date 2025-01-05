@@ -36,5 +36,8 @@ let actions = {
         API.confirmPrepChoices(player, id).then((res) => {
             console.log(res);
         }).catch(alert)
+    },
+    gameState: function(id) {
+        API.getGame(id).then((res) => res).catch(alert);
     }
 }

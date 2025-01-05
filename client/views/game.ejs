@@ -3,9 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="/style/game.css">
+    <title>Game Phase</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
-    <h1>Game File</h1>
+    <div class="container">
+        <div class="numbers">
+            <% for (let i = 0; i < 10; i++) { %>
+                <div><%= i %></div>
+            <% } %>
+        </div>
+        <div class="letters">
+            <% for (let letter of ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']) { %>
+                <div><%= letter %></div>
+            <% } %>
+        </div>
+        <div class="board" name="opponent-board">
+            <h2>Opponent's Board</h2>
+            <% for (let i = 0; i < 10; i++) { %>
+                <% for (let j = 0; j < 10; j++) { %>
+                    <div data-row="<%= i %>" data-col="<%= j %>"></div>
+                <% } %>
+            <% } %>
+        </div>
+
+        <div class="info">
+            <h3>Ships sinked</h3>
+            <ul id="ship-list"></ul>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Your Board</h2>
+        <div class="numbers">
+            <% for (let i = 0; i < 10; i++) { %>
+                <div><%= i %></div>
+            <% } %>
+        </div>
+        <div class="letters">
+            <% for (let letter of ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']) { %>
+                <div><%= letter %></div>
+            <% } %>
+        </div>
+        <div class="board" name="your-board">
+            <% for (let i = 0; i < 10; i++) { %>
+                <% for (let j = 0; j < 10; j++) { %>
+                    <div data-row="<%= i %>" data-col="<%= j %>"></div>
+                <% } %>
+            <% } %>
+        </div>
+    </div>
+    <script src="/js/API.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/actions.js"></script>
+    <script>
+        let ShipList = document.getElementById('ship-list');
+        let Cells = document.querySelectorAll('[name=opponent-board] div');
+        let ShipsOpponentSinked = [];
+        let move = [];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const Player = urlParams.get('player');
+        let Id;
+        let GameState;
+
+        const fullUrl = window.location.href;
+        const urlParts = fullUrl.split('/');
+        const gameIndex = urlParts.indexOf('game');
+        if (gameIndex !== -1 && urlParts[gameIndex + 1]) {
+            Id = urlParts[gameIndex + 1];
+        }
+
+        async function refreshGameState() {
+            GameState = await actions.gameState(Id);
+            console.log(GameState);
+        }
+
+        function toggleCellSelection(row, col) {
+            const cell = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
+            cell.classList.toggle('selected');
+        }
+
+        function addCurrentChoice(row, col) {
+            move = [row, col];
+            toggleCellSelection(row, col);
+        }
+
+        function shipListRefresh() {
+            ShipList.innerHTML = "";
+            for (let ship of new Set(ShipsOpponentSinked)) {
+                let li = document.createElement("li")
+                let span = document.createElement("span")
+                span.innerHTML = `${ShipsOpponentSinked.filter(s => s === ship).length} x `
+                let img = document.createElement("img")
+                img.height = 24
+                img.widht = 24
+                img.src = "https://img.icons8.com/ios/50/rounded-square.png"
+                img.alt = "rounded-square"
+                li.appendChild(span.cloneNode(true))
+                for (let i=0; i < ship; i++) {
+                    li.appendChild(img.cloneNode(true))
+                }
+                ShipList.appendChild(li)
+            }
+        }
+
+        shipListRefresh();
+        refreshGameState();
+
+        // Cells.forEach(field => field.addEventListener('click', () => {
+            
+        // }))
+
+    </script>
 </body>
 </html>
