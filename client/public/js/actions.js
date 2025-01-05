@@ -17,16 +17,6 @@ let actions = {
             });
         }).catch(alert)
     },
-    joinGame: function (id) {
-        const input = utils.promptUser(["Name: "]);
-        if (input) {
-            API.joinGame(...input, id).then((res) => {
-                this.refreshGames()
-            }).catch(alert)
-        } else {
-            alert("Please enter your nickname!")
-        }
-    },
     makePrepChoice: function(player, id, parts) {
         API.makePrepChoice(player, id, parts).then((res) => {
             console.log(res);

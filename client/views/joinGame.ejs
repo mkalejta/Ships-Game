@@ -30,10 +30,9 @@
     <div class="container text-center mx-auto">
         <h2>Join Game</h2>
     
-        <form action="" method="PUT">
+        <form id="joinGameForm">
             <label for="nameInput">Name: </label>
-            <input type="text" id="nameInput" name="joiner">
-    
+            <input type="text" id="nameInput" name="joiner" required>
             <button class="btn btn-primary" style="font-weight: bold; font-size: 1rem;" type="submit">Join Game</button>
         </form>
     </div>
@@ -41,21 +40,41 @@
     <script src="/js/utils.js"></script>
     <script src="/js/actions.js"></script>
     <script>
-        let Id;
+        document.getElementById('joinGameForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Zatrzymaj domyślną akcję formularza
+    
+            const joiner = document.getElementById('nameInput').value;
+            const fullUrl = window.location.href;
+            const urlParts = fullUrl.split('/');
+            const gameIndex = urlParts.indexOf('game');
+            let Id = gameIndex !== -1 && urlParts[gameIndex + 1] ? urlParts[gameIndex + 1] : null;
+    
+            if (!joiner || !Id) {
+                alert('Please provide your name and ensure the game ID is valid.');
+                return;
+            }
+    
+            try {
 
-        const fullUrl = window.location.href;
-        const urlParts = fullUrl.split('/');
-        const gameIndex = urlParts.indexOf('game');
-        if (gameIndex !== -1 && urlParts[gameIndex + 1]) {
-            Id = urlParts[gameIndex + 1];
-        }
+                const response = await fetch(`/api/game/${Id}/join?joiner=${joiner}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                });
 
-        function actionPath() {
-            document.querySelector('form').action = `/api/game/${Id}/join`;
-            return true;
-        }
-
-        actionPath()
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else if (response.ok) {
+                    const data = await response.json();
+                    alert(data.message || 'Successfully joined the game!');
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.error || 'An error occurred.');
+                }
+            } catch (error) {
+                console.error('Error while joining the game:', error);
+                alert('An unexpected error occurred.');
+            }
+        });
     </script>
 </body>
 </html>

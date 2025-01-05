@@ -2,7 +2,7 @@ const db = require("../../db")
 const Player = require("../../objects/Player")
 
 module.exports = async (req, res) => {
-    const joiner = req.body.joiner
+    const joiner = req.query.joiner
 
     if (!joiner || joiner === 'null') {
         res.status(400).json({ error: "Joiner's name is needed!" })
@@ -27,7 +27,6 @@ module.exports = async (req, res) => {
         }
         try {
             db.push("/games", data) // Aktualizacja bazy danych o polu 'games'
-            console.log(joiner);
             res.redirect(`/game/${game.id}/prep?player=${joiner}`)
         } catch (error) {
             console.error("Error saving game to DB: ", error)
