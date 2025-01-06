@@ -6,10 +6,22 @@ const middleware = require("./routing/middleware");
 const app = express();
 const socket = require('socket.io');
 const PORT = 3000;
+const { instrument } = require("@socket.io/admin-ui");
+
 
 const expressServer = app.listen(PORT, () => {
     console.log(`Backend listens on port ${PORT}`);
 });
+const io = new socket.Server(expressServer, {
+    cors: {
+        origin: ["https://admin.socket.io"],
+        credentials: true,
+    },
+});
+instrument(io, {
+    auth: false
+});
+
 
 // Ustawienia widoków
 app.set("view engine", "ejs");
@@ -21,10 +33,6 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/api", middleware, routing);
-
-const io = new socket.Server(expressServer, {
-    cors: { origin: "*" }
-});
 
 
 // Generowanie widoków
