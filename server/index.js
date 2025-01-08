@@ -2,9 +2,27 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const routing = require("./routing");
-const middleware = require("./routing/middleware")
+const middleware = require("./routing/middleware");
 const app = express();
+const socket = require('socket.io');
 const PORT = 3000;
+const { instrument } = require("@socket.io/admin-ui");
+const Player = require('./objects/Player');
+
+
+const expressServer = app.listen(PORT, () => {
+    console.log(`Backend listens on port ${PORT}`);
+});
+const io = new socket.Server(expressServer, {
+    cors: {
+        origin: ["https://admin.socket.io"],
+        credentials: true,
+    },
+});
+instrument(io, {
+    auth: false
+});
+
 
 // Ustawienia widoków
 app.set("view engine", "ejs");
@@ -13,10 +31,12 @@ app.set("views", path.join(__dirname, "../client/views"));
 app.use(express.static(path.join(__dirname, "../client/public")));
 
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/api", middleware, routing);
 
+
+// Generowanie widoków
 app.get('/', (req, res) => {
     res.render("home.ejs");
 });
@@ -41,6 +61,17 @@ app.get('/game/:id/prep', (req, res) => {
     res.render("prep.ejs");
 })
 
-app.listen(PORT, () => {
-    console.log(`Backend listens on port ${PORT}`);
-});
+
+io.on('connection', socket => {
+    console.log('a user connected')
+
+    socket.on('move', move => {
+        console.log(move)
+        io.emit('message', move)
+    })
+
+    socket.on('join', (player, gameName) => {
+        socket.join(gameName)
+        socket.to(gameName).emit('joined', `${player} has joined game ${gameName}`)
+    })
+})

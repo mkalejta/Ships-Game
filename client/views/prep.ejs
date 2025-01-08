@@ -40,6 +40,8 @@
     <script src="/js/API.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/actions.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/script.js"></script>
     <script>
         let ShipList = document.getElementById('ship-list');
         let AddButton = document.getElementById('add');
@@ -262,6 +264,24 @@
             Info.hidden = true;
             actions.prepConfirm(Player, Id);
         });
+
+        function newPlayer(message) {
+            alert(message)
+        }
+
+        async function roomJoining() {
+            const game = await actions.gameState(Id);
+            const gameName = game.name;
+            socket.emit('join', Player, gameName, (message) => {
+                newPlayer(message);
+            });
+        }
+
+        socket.on('joined', (message) => {
+            newPlayer(message)
+        })
+
+        roomJoining()
     </script>
 </body>
 </html>

@@ -32,13 +32,15 @@
     
         <form action="/api/game/create" method="POST">
             <label for="nameInput">Name: </label>
-            <input type="text" id="nameInput" name="creator">
+            <input type="text" id="nameInput" name="creator" required>
     
             <label for="gameNameInput">Game name: </label>
-            <input type="text" id="gameNameInput" name="gameName">
+            <input type="text" id="gameNameInput" name="gameName" required>
     
             <button class="btn btn-primary" style="font-weight: bold; font-size: 1rem;" type="submit">Create Game</button>
         </form>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/script.js"></script>
 </body>
 </html>

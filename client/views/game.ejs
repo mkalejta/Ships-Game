@@ -6,8 +6,13 @@
     <link rel="stylesheet" href="/style/game.css">
     <title>Game Phase</title>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script> -->
 </head>
 <body>
+    <!-- <div class="info">
+        <h3>Ships sinked</h3>
+        <ul id="ship-list"></ul>
+    </div> -->
     <div class="container">
         <div class="numbers">
             <% for (let i = 0; i < 10; i++) { %>
@@ -28,10 +33,10 @@
             <% } %>
         </div>
 
-        <div class="info">
-            <h3>Ships sinked</h3>
-            <ul id="ship-list"></ul>
-        </div>
+    </div>
+    <div class="messages-box">
+        <h3>Messages</h3>
+        <ul id="messages"></ul>
     </div>
     <div class="container">
         <h2>Your Board</h2>
@@ -56,10 +61,15 @@
     <script src="/js/API.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/actions.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/script.js"></script>
     <script>
+        const Letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+
         let ShipList = document.getElementById('ship-list');
         let Cells = document.querySelectorAll('[name=opponent-board] div');
         let Cells2 = document.querySelectorAll('[name=your-board] div');
+        let Messages = document.getElementById('messages');
         let ShipsOpponentSinked = [];
         let move = [];
 
@@ -76,6 +86,21 @@
         if (gameIndex !== -1 && urlParts[gameIndex + 1]) {
             Id = urlParts[gameIndex + 1].split('?')[0];
         }
+
+        
+        socket.on('message', text => {
+            const isScrolledToBottom = Messages.scrollHeight - Messages.clientHeight <= Messages.scrollTop + 1
+            const el = document.createElement('li');
+            const [ x, y ] = text;
+            const letter = Letters[x];
+            el.innerHTML = `${Player}: ${letter} ${y}`;
+
+            Messages.appendChild(el);
+
+            if (isScrolledToBottom) {
+                Messages.scrollTop = Messages.scrollHeight - Messages.clientHeight
+            }
+        })
 
         async function refreshGameState() {
             GameState = await actions.gameState(Id);
@@ -112,13 +137,14 @@
             }
         }
 
-        shipListRefresh();
+        // shipListRefresh();
         refreshGameState();
 
         Cells.forEach(field => field.addEventListener('click', () => {
             const [ row, col ] = [field.attributes['data-row'].value, field.attributes['data-col'].value];
             move = [ row, col ];
             actions.makeMove(Player, Id, { move });
+            socket.emit('move', move);
             refreshGameState();
         }))
 
