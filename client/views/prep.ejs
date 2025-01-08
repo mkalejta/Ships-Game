@@ -272,9 +272,7 @@
         async function roomJoining() {
             const game = await actions.gameState(Id);
             const gameName = game.name;
-            socket.emit('join', Player, gameName, (message) => {
-                newPlayer(message);
-            });
+            socket.emit('join', Player, gameName);
         }
 
         socket.on('joined', (message) => {
