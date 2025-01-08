@@ -7,6 +7,7 @@ const app = express();
 const socket = require('socket.io');
 const PORT = 3000;
 const { instrument } = require("@socket.io/admin-ui");
+const Player = require('./objects/Player');
 
 
 const expressServer = app.listen(PORT, () => {
@@ -61,11 +62,16 @@ app.get('/game/:id/prep', (req, res) => {
 })
 
 
-io.on('connection', (socket) => {
-    console.log('a user connected');
+io.on('connection', socket => {
+    console.log('a user connected')
 
-    socket.on('move', (move) => {
-        console.log(move);
-        io.emit('message', move);
+    socket.on('move', move => {
+        console.log(move)
+        io.emit('message', move)
+    })
+
+    socket.on('join', (player, gameName) => {
+        socket.join(gameName)
+        socket.to(gameName).emit('joined', `${player} has joined game ${gameName}`)
     })
 })
