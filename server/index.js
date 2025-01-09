@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const routing = require("./routing");
 const middleware = require("./routing/middleware");
 const app = express();
-const socket = require('socket.io');
+const { Server } = require('socket.io');
 const PORT = 3000;
 const { instrument } = require("@socket.io/admin-ui");
 const Player = require('./objects/Player');
@@ -13,7 +13,7 @@ const Player = require('./objects/Player');
 const expressServer = app.listen(PORT, () => {
     console.log(`Backend listens on port ${PORT}`);
 });
-const io = new socket.Server(expressServer, {
+const io = new Server(expressServer, {
     cors: {
         origin: ["https://admin.socket.io"],
         credentials: true,
@@ -62,6 +62,9 @@ app.get('/game/:id/prep', (req, res) => {
 })
 
 
+const alerts = {};
+
+
 io.on('connection', socket => {
     console.log('a user connected')
 
@@ -70,8 +73,18 @@ io.on('connection', socket => {
         io.emit('message', move)
     })
 
-    socket.on('join', (player, gameName) => {
-        socket.join(gameName)
-        socket.to(gameName).emit('joined', `${player} has joined game ${gameName}`)
+    socket.on('join game', ({ player, gameId }, cb) => {
+        if(!alerts[gameId]) {
+            alerts[gameId] = [];
+        }
+        socket.join(gameId);
+        const alert = `${player} has joined game.`;
+
+        if (!alerts[gameId].includes(alert)) {
+            alerts[gameId].push(alert);
+            socket.to(gameId).emit('new alert', alert);
+        }
+
+        cb(alerts[gameId]);
     })
 })

@@ -9,6 +9,9 @@
 </head>
 <body>
     <h1>Preparation Phase</h1>
+    <div class="prep-alert-box">
+        <ul id="prep-alerts"></ul>
+    </div>
     <div class="container">
         <div class="numbers">
             <% for (let i = 0; i < 10; i++) { %>
@@ -49,6 +52,7 @@
         let ConfirmButton = document.getElementById('confirm');
         let Cells = document.querySelectorAll('.board div');
         let Info = document.getElementsByClassName('info')[0];
+        let PrepAlerts = document.getElementById('prep-alerts');
 
         let startShipSizes = [2, 2, 2, 3, 3, 4];
         let currentShipSizes = [...startShipSizes];
@@ -265,18 +269,23 @@
             actions.prepConfirm(Player, Id);
         });
 
-        function newPlayer(message) {
-            alert(message)
+        function newAlert(message) {
+            let li = document.createElement('li');
+            li.innerText = message;
+            PrepAlerts.appendChild(li);
         }
 
         async function roomJoining() {
-            const game = await actions.gameState(Id);
-            const gameName = game.name;
-            socket.emit('join', Player, gameName);
+            socket.emit('join game', { player: Player, gameId: Id }, (previousAlerts) => {
+                PrepAlerts.innerHTML = '';
+                previousAlerts.forEach((alert) => {
+                    newAlert(alert);
+                });
+            });
         }
 
-        socket.on('joined', (message) => {
-            newPlayer(message)
+        socket.on('new alert', (alert) => {
+            newAlert(alert);
         })
 
         roomJoining()

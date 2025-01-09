@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +15,6 @@
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "node-json-db": "^2.3.0",
-    "nodemon": "^3.1.9",
     "socket.io": "^4.8.1",
     "uuid": "^11.0.3"
   }
