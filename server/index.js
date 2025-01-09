@@ -8,6 +8,7 @@ const { Server } = require('socket.io');
 const PORT = 3000;
 const { instrument } = require("@socket.io/admin-ui");
 const Player = require('./objects/Player');
+const game = require('./routing/game');
 
 
 const expressServer = app.listen(PORT, () => {
@@ -62,7 +63,7 @@ app.get('/game/:id/prep', (req, res) => {
 })
 
 
-const alerts = {};
+const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
 
 
 io.on('connection', socket => {
@@ -75,16 +76,33 @@ io.on('connection', socket => {
 
     socket.on('join game', ({ player, gameId }, cb) => {
         if(!alerts[gameId]) {
-            alerts[gameId] = [];
+            alerts[gameId] = []
         }
-        socket.join(gameId);
-        const alert = `${player} has joined game.`;
+
+        socket.join(gameId)
+        const alert = `${player} has joined game`
 
         if (!alerts[gameId].includes(alert)) {
-            alerts[gameId].push(alert);
-            socket.to(gameId).emit('new alert', alert);
+            alerts[gameId].push(alert)
+            socket.to(gameId).emit('add alert', alert)
         }
 
-        cb(alerts[gameId]);
+        cb(alerts[gameId])
     })
-})
+
+    socket.on('ready', ({ player, gameId }, cb) => {
+        if(!alerts[gameId]) {
+            alerts[gameId] = []
+        }
+        const alert = `${player} is ready`
+
+        if (!alerts[gameId].includes(alert)) {
+            alerts[gameId].push(alert)
+            socket.to(gameId).emit('add alert', alert)
+        }
+
+        socket.to(gameId).emit('start game')
+        
+        cb(alerts[gameId])
+    })
+});

@@ -267,6 +267,12 @@
             });
             Info.hidden = true;
             actions.prepConfirm(Player, Id);
+            socket.emit('ready', { player: Player, gameId: Id }, (previousAlerts) => {
+                PrepAlerts.innerHTML = ''
+                previousAlerts.forEach((alert) => {
+                    newAlert(alert)
+                });
+            });
         });
 
         function newAlert(message) {
@@ -277,18 +283,32 @@
 
         async function roomJoining() {
             socket.emit('join game', { player: Player, gameId: Id }, (previousAlerts) => {
-                PrepAlerts.innerHTML = '';
+                PrepAlerts.innerHTML = ''
                 previousAlerts.forEach((alert) => {
-                    newAlert(alert);
+                    newAlert(alert)
                 });
             });
         }
 
-        socket.on('new alert', (alert) => {
-            newAlert(alert);
+        async function ifGameStart() {
+            const GameState = await actions.gameState(Id).then(data => data)
+            return Object.values({...GameState}.players).map(player => player.ready).every(val => val === true)
+        }
+
+        socket.on('add alert', alert => {
+            newAlert(alert)
         })
 
-        roomJoining()
+        socket.on('start game', async () => {
+            const ifStart = await ifGameStart();
+            if (ifStart) {
+                setTimeout(() => {
+                    document.location.href = `/game/${Id}?player=${Player}`;
+                }, 3000);
+            }
+        })
+
+        roomJoining();
     </script>
 </body>
 </html>
