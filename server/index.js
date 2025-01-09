@@ -64,14 +64,27 @@ app.get('/game/:id/prep', (req, res) => {
 
 
 const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
-
+const Letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
 io.on('connection', socket => {
     console.log('a user connected')
 
-    socket.on('move', move => {
+    socket.on('move', ({ player, move }, cb) => {
         console.log(move)
-        io.emit('message', move)
+        const [ x, y ] = move
+        const letter = Letters[x]
+        const message = `${player}: ${letter} ${y}`
+        io.emit('message', message)
+
+        cb()
+    })
+
+    socket.on('hit', () => {
+        io.emit('message', 'Hit!')
+    })
+
+    socket.on('sink', () => {
+        io.emit('message', 'Hit & Sink!')
     })
 
     socket.on('join game', ({ player, gameId }, cb) => {
@@ -84,7 +97,7 @@ io.on('connection', socket => {
 
         if (!alerts[gameId].includes(alert)) {
             alerts[gameId].push(alert)
-            socket.to(gameId).emit('add alert', alert)
+            io.to(gameId).emit('add alert', alert)
         }
 
         cb(alerts[gameId])
@@ -98,11 +111,11 @@ io.on('connection', socket => {
 
         if (!alerts[gameId].includes(alert)) {
             alerts[gameId].push(alert)
-            socket.to(gameId).emit('add alert', alert)
+            io.to(gameId).emit('add alert', alert)
         }
 
-        socket.to(gameId).emit('start game')
-        
+        io.to(gameId).emit('start game')
+
         cb(alerts[gameId])
     })
 });

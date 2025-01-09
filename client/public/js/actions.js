@@ -38,8 +38,6 @@ let actions = {
         }).catch(alert);
     },
     makeMove: function(player, id, move) {
-        API.makeMove(player, id, move).then((res) => {
-            console.log(res);
-        }).catch(alert);
+        API.makeMove(player, id, move).then((res) => res).catch(alert);
     }
 }

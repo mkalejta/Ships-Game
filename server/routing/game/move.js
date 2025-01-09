@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
     boardObj.ships = boardObj.ships.map(ship => ship = new Ship(ship.parts.map(part => part.position))); // Zamiana danych na obiekty Ship
 
     boardObj.make_move(move); // Wykonanie ruchu
+    console.log(boardObj);
     game.players[player].boards['opponent'] = boardObj; // Aktualizacja obiektu 'game'
     game.players[opponent].boards['self'] = game.players[player].boards['opponent']
 
