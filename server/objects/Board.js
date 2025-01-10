@@ -36,8 +36,7 @@ class Board {
     }
 
     make_move(move) {
-        for (let i=0; i < this.ships.length; i++) {
-            let ship = this.ships[i]
+        for (let ship of this.ships) {
             if (ship.ifHit(move)) {
                 this.board[move[0]][move[1]] = String(ship.size)
                 if (ship.sink) {
