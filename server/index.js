@@ -64,27 +64,61 @@ app.get('/game/:id/prep', (req, res) => {
 
 
 const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
+const moves = {}; // -- || --
 const Letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+const ships = {};
 
 io.on('connection', socket => {
     console.log('a user connected')
 
-    socket.on('move', ({ player, move }, cb) => {
-        console.log(move)
+    socket.on('start game', ({ player, gameId }, cb) => {
+        if(!moves[gameId]) {
+            moves[gameId] = []
+        }
+
+        if(!ships[gameId]) {
+            ships[gameId] = {}
+        }
+
+        if(!ships[gameId][player]) {
+            ships[gameId][player] = []
+        }
+
+        socket.join(gameId)
+
+        cb(moves[gameId], ships[gameId][player])
+    })
+
+    socket.on('move', ({ player, move, gameId }, cb) => {
         const [ x, y ] = move
         const letter = Letters[x]
-        const message = `${player}: ${letter} ${y}`
-        io.emit('message', message)
+        const message = `${player}: ${letter}${y}`
+
+        moves[gameId].push(message)
+        io.to(gameId).emit('message', message)
 
         cb()
     })
 
-    socket.on('hit', () => {
-        io.emit('message', 'Hit!')
+    socket.on('hit', ({ gameId }) => {
+        const message = "Hit!"
+        moves[gameId].push(message)
+        io.to(gameId).emit('message', message)
     })
 
-    socket.on('sink', () => {
-        io.emit('message', 'Hit & Sink!')
+    socket.on('sink', ({ gameId, player, shipsSinked }) => {
+        const message = "Hit & Sink!"
+        moves[gameId].push(message)
+        ships[gameId][player] = shipsSinked
+        io.to(gameId).emit('message', message)
+    })
+
+    socket.on('miss', ({ gameId }) => {
+        io.to(gameId).except(socket.id).emit('your turn')
+    })
+
+    socket.on('winner', ({ gameId, winner }) => {
+        io.to(gameId).emit('win', winner)
     })
 
     socket.on('join game', ({ player, gameId }, cb) => {

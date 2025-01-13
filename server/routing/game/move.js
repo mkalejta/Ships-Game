@@ -26,6 +26,9 @@ module.exports = async (req, res) => {
     boardObj.make_move(move); // Wykonanie ruchu
 
     game.players[player].boards['opponent'] = boardObj; // Aktualizacja obiektu 'game'
+    if (boardObj.ifAllSink()) {
+        game.winner = player
+    }
 
     let j;
     for(let i=0; i < data.length; i++) {

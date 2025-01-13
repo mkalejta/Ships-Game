@@ -6,13 +6,8 @@
     <link rel="stylesheet" href="/style/game.css">
     <title>Game Phase</title>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <!-- <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script> -->
 </head>
 <body>
-    <!-- <div class="info">
-        <h3>Ships sinked</h3>
-        <ul id="ship-list"></ul>
-    </div> -->
     <div class="container">
         <div class="numbers">
             <% for (let i = 0; i < 10; i++) { %>
@@ -25,7 +20,7 @@
             <% } %>
         </div>
         <div class="board" name="opponent-board">
-            <h2>Opponent's Board</h2>
+            <h2 id="opponent-name"></h2>
             <% for (let i = 0; i < 10; i++) { %>
                 <% for (let j = 0; j < 10; j++) { %>
                     <div data-row="<%= i %>" data-col="<%= j %>"></div>
@@ -33,6 +28,10 @@
             <% } %>
         </div>
 
+        <div class="info">
+            <h3>Ships sinked</h3>
+            <ul id="ship-list"></ul>
+        </div>
     </div>
     <div class="messages-box">
         <h3>Messages</h3>
@@ -53,7 +52,7 @@
         <div class="board" name="your-board">
             <% for (let i = 0; i < 10; i++) { %>
                 <% for (let j = 0; j < 10; j++) { %>
-                    <div data-row="<%= i %>" data-col="<%= j %>"></div>
+                    <div data-row2="<%= i %>" data-col2="<%= j %>"></div>
                 <% } %>
             <% } %>
         </div>
@@ -68,6 +67,7 @@
         let Cells = document.querySelectorAll('[name=opponent-board] div');
         let Cells2 = document.querySelectorAll('[name=your-board] div');
         let Messages = document.getElementById('messages');
+        let OpponentName = document.getElementById('opponent-name');
         let ShipsOpponentSinked = [];
         let move = [];
         let hitShip;
@@ -87,11 +87,18 @@
             Id = urlParts[gameIndex + 1].split('?')[0];
         }
 
+        function getOpponent(game, player) {
+            let opponent = Object.keys(game.players).filter(name => name !== player)[0]
+            return opponent;
+        }
+
         async function refreshGameState() {
             GameState = await actions.gameState(Id).then(data => data);
+            OpponentName.innerHTML = `${getOpponent(GameState, Player)}'s Board`;
             OpponentBoard = GameState.players[Player].boards["opponent"].board;
             YourBoard = GameState.players[Player].boards["self"].board;
             OpponentShips = GameState.players[Player].boards["opponent"].ships;
+
             OpponentBoard.forEach((row, i) => {
                 row.forEach((field, j) => {
                     const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
@@ -99,6 +106,19 @@
                         cell.classList.add('miss');
                     } else if (field !== '1') {
                         cell.classList.add('ship');
+                    }
+                })
+            })
+
+            YourBoard.forEach((row, i) => {
+                row.forEach((field, j) => {
+                    const cell = document.querySelector(`[data-row2='${i}'][data-col2='${j}']`);
+                    if (field === '0') {
+                        cell.classList.add('miss');
+                    } else if (field !== '1') {
+                        cell.classList.add('ship');
+                    } else {
+                        cell.classList.add('disabled');
                     }
                 })
             })
@@ -123,7 +143,7 @@
             }
         }
 
-        // shipListRefresh();
+        shipListRefresh();
         refreshGameState();
 
         Cells.forEach(field => field.addEventListener('click', async () => {
@@ -131,14 +151,27 @@
             move = [ row, col ];
             await actions.makeMove(Player, Id, { move });
             await refreshGameState();
-            console.log(GameState)
-            socket.emit('move', { player: Player, move }, () => {
+            socket.emit('move', { player: Player, move, gameId: Id }, () => {
                 if (ifHit(move) && ifSink()) {
-                    socket.emit('sink')
+                    ShipsOpponentSinked.push(hitShip.size)
+                    socket.emit('sink', { gameId: Id, player: Player, shipsSinked: ShipsOpponentSinked })
+                    shipListRefresh();
                 } else if (ifHit(move)) {
-                    socket.emit('hit')
+                    socket.emit('hit', { gameId: Id })
+                } else {
+                    OpponentBoard.forEach((row, i) => {
+                        row.forEach((field, j) => {
+                            const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
+                            if (field === '1') {
+                                cell.classList.add('disabled');
+                            }
+                        })
+                    })
+                    socket.emit('miss', { gameId: Id })
                 }
             });
+            
+            ifWinner();
         }))
 
         function ifHit(move) {
@@ -155,18 +188,57 @@
             return hitShip.sink
         }
 
-        socket.on('message', message => {
+        function ifWinner() {
+            if (GameState.winner) {
+                socket.emit('winner', { gameId: Id, winner: GameState.winner })
+            }
+        }
+
+        function newMessage(message) {
             const isScrolledToBottom = Messages.scrollHeight - Messages.clientHeight <= Messages.scrollTop + 1
-            const el = document.createElement('li');
-            el.innerHTML = message;
+            let el = document.createElement('li');
+            el.innerText = message;
 
             Messages.appendChild(el);
-
+            
             if (isScrolledToBottom) {
                 Messages.scrollTop = Messages.scrollHeight - Messages.clientHeight
             }
+        }
+
+        async function startGame() {
+            socket.emit('start game', { player: Player, gameId: Id }, (previousMoves, shipsSinked) => {
+                ShipsOpponentSinked = shipsSinked
+                Messages.innerHTML = ''
+                previousMoves.forEach((move) => {
+                    newMessage(move)
+                });
+                shipListRefresh()
+            });
+        }
+
+        socket.on('message', message => {
+            newMessage(message);
+            refreshGameState();
         })
 
+        socket.on('your turn', () => {
+            OpponentBoard.forEach((row, i) => {
+                row.forEach((field, j) => {
+                    const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
+                    if (field === '1') {
+                        cell.classList.remove('disabled');
+                    }
+                })
+            })
+        })
+
+        socket.on('win', winner => {
+            alert(`${winner} wins!`)
+            document.location.href = '/game';
+        })
+
+        startGame()
     </script>
 </body>
 </html>

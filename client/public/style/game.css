@@ -5,7 +5,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    gap: 10rem;
+    gap: 4rem;
     background-color: #f0f0f0;
 }
 
@@ -87,7 +87,7 @@ body {
     background-color: #e0e0e0;
 }
 
-/* .info {
+.info {
     background-color: white;
     border: 1px solid #ccc;
     padding: 10px;
@@ -121,7 +121,11 @@ body {
 
 .info ul#ship-list li span {
     margin-right: 0.5rem;
-} */
+}
+
+.board div.disabled {
+    pointer-events: none;
+}
 
 .board div.miss {
     background-color: red;
