@@ -137,6 +137,11 @@ body {
     pointer-events: none;
 }
 
+.board div.hit {
+    background-color: black;
+    pointer-events: none;
+}
+
 .board div.all-placed {
     pointer-events: none;
 }
