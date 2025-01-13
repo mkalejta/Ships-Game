@@ -8,6 +8,7 @@ const { Server } = require('socket.io');
 const PORT = 3000;
 const { instrument } = require("@socket.io/admin-ui");
 const Player = require('./objects/Player');
+const game = require('./routing/game');
 
 
 const expressServer = app.listen(PORT, () => {
@@ -62,29 +63,93 @@ app.get('/game/:id/prep', (req, res) => {
 })
 
 
-const alerts = {};
-
+const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
+const moves = {}; // -- || --
+const Letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+const ships = {};
 
 io.on('connection', socket => {
     console.log('a user connected')
 
-    socket.on('move', move => {
-        console.log(move)
-        io.emit('message', move)
+    socket.on('start game', ({ player, gameId }, cb) => {
+        if(!moves[gameId]) {
+            moves[gameId] = []
+        }
+
+        if(!ships[gameId]) {
+            ships[gameId] = {}
+        }
+
+        if(!ships[gameId][player]) {
+            ships[gameId][player] = []
+        }
+
+        socket.join(gameId)
+
+        cb(moves[gameId], ships[gameId][player])
+    })
+
+    socket.on('move', ({ player, move, gameId }, cb) => {
+        const [ x, y ] = move
+        const letter = Letters[x]
+        const message = `${player}: ${letter}${y}`
+
+        moves[gameId].push(message)
+        io.to(gameId).emit('message', message)
+
+        cb()
+    })
+
+    socket.on('hit', ({ gameId }) => {
+        const message = "Hit!"
+        moves[gameId].push(message)
+        io.to(gameId).emit('message', message)
+    })
+
+    socket.on('sink', ({ gameId, player, shipsSinked }) => {
+        const message = "Hit & Sink!"
+        moves[gameId].push(message)
+        ships[gameId][player] = shipsSinked
+        io.to(gameId).emit('message', message)
+    })
+
+    socket.on('miss', ({ gameId }) => {
+        io.to(gameId).except(socket.id).emit('your turn')
+    })
+
+    socket.on('winner', ({ gameId, winner }) => {
+        io.to(gameId).emit('win', winner)
     })
 
     socket.on('join game', ({ player, gameId }, cb) => {
         if(!alerts[gameId]) {
-            alerts[gameId] = [];
+            alerts[gameId] = []
         }
-        socket.join(gameId);
-        const alert = `${player} has joined game.`;
+
+        socket.join(gameId)
+        const alert = `${player} has joined game`
 
         if (!alerts[gameId].includes(alert)) {
-            alerts[gameId].push(alert);
-            socket.to(gameId).emit('new alert', alert);
+            alerts[gameId].push(alert)
+            io.to(gameId).emit('add alert', alert)
         }
 
-        cb(alerts[gameId]);
+        cb(alerts[gameId])
     })
-})
+
+    socket.on('ready', ({ player, gameId }, cb) => {
+        if(!alerts[gameId]) {
+            alerts[gameId] = []
+        }
+        const alert = `${player} is ready`
+
+        if (!alerts[gameId].includes(alert)) {
+            alerts[gameId].push(alert)
+            io.to(gameId).emit('add alert', alert)
+        }
+
+        io.to(gameId).emit('start game')
+
+        cb(alerts[gameId])
+    })
+});

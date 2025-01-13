@@ -1,25 +1,24 @@
 
 class Ship {
 
-    constructor(parts) {
+    constructor(parts, sink=false) {
         this.parts = parts.map(part => ({
-            position: part,
-            hit: false
+            position: part.position,
+            hit: part.hit
         }))
         this.size = this.parts.length
-        this.sink = false
+        this.sink = sink
     }
 
     ifHit(move) {
-        let hit = false;
-        this.parts.forEach((part, i) => {
+        for (let part of this.parts) {
             if (part.position[0] === move[0] && part.position[1] === move[1]) {
-                this.parts[i].hit = true;
-                hit = true;
+                part.hit = true
                 this.ifSink();
+                return true;
             }
-        });
-        return hit;
+        }
+        return false;
     }
 
     ifSink() {

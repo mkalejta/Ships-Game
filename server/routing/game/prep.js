@@ -22,7 +22,10 @@ module.exports = async (req, res) => {
 
     switch (req.method) {
         case "PUT": // Zaznaczenie ułożenia statku
-            const parts = req.body.parts
+            const parts = req.body.parts.map(part => ({
+                position: part,
+                hit: false
+            }))
             if (!parts) {
                 res.status(400).json({ error: "Ship has to be given!" })
                 return;

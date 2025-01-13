@@ -21,22 +21,33 @@ module.exports = async (req, res) => {
     }
     
     let boardObj = Object.assign(new Board(), game.players[player].boards['opponent']); // Zamiana danych na obiekt Board
-    boardObj.ships = boardObj.ships.map(ship => ship = new Ship(ship.parts.map(part => part.position))); // Zamiana danych na obiekty Ship
+    boardObj.ships = boardObj.ships.map(ship => new Ship(ship.parts, ship.sink)); // Zamiana danych na obiekty Ship
 
     boardObj.make_move(move); // Wykonanie ruchu
-    game.players[player].boards['opponent'] = boardObj; // Aktualizacja obiektu 'game'
-    game.players[opponent].boards['self'] = game.players[player].boards['opponent']
 
+    game.players[player].boards['opponent'] = boardObj; // Aktualizacja obiektu 'game'
+    if (boardObj.ifAllSink()) {
+        game.winner = player
+    }
+
+    let j;
     for(let i=0; i < data.length; i++) {
         if (data[i].id === req.params.id) {
-            data[i] = game
+            data[i] = { ...game }
+            data[i].players[opponent].boards['self'] = data[i].players[player].boards['opponent']
             console.log(`${player}: ${move[0]} ${move[1]}`)
-            res.status(200).json(data[i])
+            j = i
+            break;
         }
     }
 
-    db.push("/games", data) // Aktualizacja bazy danych o polu 'games'
-    return;
+    try {
+        await db.push("/games", data) // Aktualizacja bazy danych o polu 'games'
+        return res.status(200).json(data[j])
+    } catch (error) {
+        console.error("Error saving game to DB: ", error)
+        return res.status(500).json({ error: "Failed to save game to DB" });
+    }
 }
 
 function getOpponent(game, player) {

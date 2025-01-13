@@ -6,13 +6,8 @@
     <link rel="stylesheet" href="/style/game.css">
     <title>Game Phase</title>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <!-- <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script> -->
 </head>
 <body>
-    <!-- <div class="info">
-        <h3>Ships sinked</h3>
-        <ul id="ship-list"></ul>
-    </div> -->
     <div class="container">
         <div class="numbers">
             <% for (let i = 0; i < 10; i++) { %>
@@ -25,7 +20,7 @@
             <% } %>
         </div>
         <div class="board" name="opponent-board">
-            <h2>Opponent's Board</h2>
+            <h2 id="opponent-name"></h2>
             <% for (let i = 0; i < 10; i++) { %>
                 <% for (let j = 0; j < 10; j++) { %>
                     <div data-row="<%= i %>" data-col="<%= j %>"></div>
@@ -33,6 +28,10 @@
             <% } %>
         </div>
 
+        <div class="info">
+            <h3>Ships sinked</h3>
+            <ul id="ship-list"></ul>
+        </div>
     </div>
     <div class="messages-box">
         <h3>Messages</h3>
@@ -53,7 +52,7 @@
         <div class="board" name="your-board">
             <% for (let i = 0; i < 10; i++) { %>
                 <% for (let j = 0; j < 10; j++) { %>
-                    <div data-row="<%= i %>" data-col="<%= j %>"></div>
+                    <div data-row2="<%= i %>" data-col2="<%= j %>"></div>
                 <% } %>
             <% } %>
         </div>
@@ -64,14 +63,14 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js"></script>
     <script>
-        const Letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-
         let ShipList = document.getElementById('ship-list');
         let Cells = document.querySelectorAll('[name=opponent-board] div');
         let Cells2 = document.querySelectorAll('[name=your-board] div');
         let Messages = document.getElementById('messages');
+        let OpponentName = document.getElementById('opponent-name');
         let ShipsOpponentSinked = [];
         let move = [];
+        let hitShip;
 
         const urlParams = new URLSearchParams(window.location.search);
         const Player = urlParams.get('player');
@@ -79,6 +78,7 @@
         let GameState;
         let OpponentBoard;
         let YourBoard;
+        let OpponentShips;
 
         const fullUrl = window.location.href;
         const urlParts = fullUrl.split('/');
@@ -87,25 +87,18 @@
             Id = urlParts[gameIndex + 1].split('?')[0];
         }
 
-        
-        socket.on('message', text => {
-            const isScrolledToBottom = Messages.scrollHeight - Messages.clientHeight <= Messages.scrollTop + 1
-            const el = document.createElement('li');
-            const [ x, y ] = text;
-            const letter = Letters[x];
-            el.innerHTML = `${Player}: ${letter} ${y}`;
-
-            Messages.appendChild(el);
-
-            if (isScrolledToBottom) {
-                Messages.scrollTop = Messages.scrollHeight - Messages.clientHeight
-            }
-        })
+        function getOpponent(game, player) {
+            let opponent = Object.keys(game.players).filter(name => name !== player)[0]
+            return opponent;
+        }
 
         async function refreshGameState() {
-            GameState = await actions.gameState(Id);
+            GameState = await actions.gameState(Id).then(data => data);
+            OpponentName.innerHTML = `${getOpponent(GameState, Player)}'s Board`;
             OpponentBoard = GameState.players[Player].boards["opponent"].board;
-            YourBoard = {...GameState}.players[Player].boards["self"].board;
+            YourBoard = GameState.players[Player].boards["self"].board;
+            OpponentShips = GameState.players[Player].boards["opponent"].ships;
+
             OpponentBoard.forEach((row, i) => {
                 row.forEach((field, j) => {
                     const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
@@ -113,6 +106,19 @@
                         cell.classList.add('miss');
                     } else if (field !== '1') {
                         cell.classList.add('ship');
+                    }
+                })
+            })
+
+            YourBoard.forEach((row, i) => {
+                row.forEach((field, j) => {
+                    const cell = document.querySelector(`[data-row2='${i}'][data-col2='${j}']`);
+                    if (field === '0') {
+                        cell.classList.add('miss');
+                    } else if (field !== '1') {
+                        cell.classList.add('ship');
+                    } else {
+                        cell.classList.add('disabled');
                     }
                 })
             })
@@ -137,17 +143,102 @@
             }
         }
 
-        // shipListRefresh();
+        shipListRefresh();
         refreshGameState();
 
-        Cells.forEach(field => field.addEventListener('click', () => {
+        Cells.forEach(field => field.addEventListener('click', async () => {
             const [ row, col ] = [field.attributes['data-row'].value, field.attributes['data-col'].value];
             move = [ row, col ];
-            actions.makeMove(Player, Id, { move });
-            socket.emit('move', move);
-            refreshGameState();
+            await actions.makeMove(Player, Id, { move });
+            await refreshGameState();
+            socket.emit('move', { player: Player, move, gameId: Id }, () => {
+                if (ifHit(move) && ifSink()) {
+                    ShipsOpponentSinked.push(hitShip.size)
+                    socket.emit('sink', { gameId: Id, player: Player, shipsSinked: ShipsOpponentSinked })
+                    shipListRefresh();
+                } else if (ifHit(move)) {
+                    socket.emit('hit', { gameId: Id })
+                } else {
+                    OpponentBoard.forEach((row, i) => {
+                        row.forEach((field, j) => {
+                            const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
+                            if (field === '1') {
+                                cell.classList.add('disabled');
+                            }
+                        })
+                    })
+                    socket.emit('miss', { gameId: Id })
+                }
+            });
+            
+            ifWinner();
         }))
 
+        function ifHit(move) {
+            for (let ship of OpponentShips) {
+                if (ship.parts.some(part => part.position[0] === move[0] && part.position[1] === move[1])) {
+                    hitShip = {...ship}
+                    return true
+                }
+            }
+            return false
+        }
+
+        function ifSink() {
+            return hitShip.sink
+        }
+
+        function ifWinner() {
+            if (GameState.winner) {
+                socket.emit('winner', { gameId: Id, winner: GameState.winner })
+            }
+        }
+
+        function newMessage(message) {
+            const isScrolledToBottom = Messages.scrollHeight - Messages.clientHeight <= Messages.scrollTop + 1
+            let el = document.createElement('li');
+            el.innerText = message;
+
+            Messages.appendChild(el);
+            
+            if (isScrolledToBottom) {
+                Messages.scrollTop = Messages.scrollHeight - Messages.clientHeight
+            }
+        }
+
+        async function startGame() {
+            socket.emit('start game', { player: Player, gameId: Id }, (previousMoves, shipsSinked) => {
+                ShipsOpponentSinked = shipsSinked
+                Messages.innerHTML = ''
+                previousMoves.forEach((move) => {
+                    newMessage(move)
+                });
+                shipListRefresh()
+            });
+        }
+
+        socket.on('message', message => {
+            newMessage(message);
+            refreshGameState();
+        })
+
+        socket.on('your turn', () => {
+            OpponentBoard.forEach((row, i) => {
+                row.forEach((field, j) => {
+                    const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
+                    if (field === '1') {
+                        cell.classList.remove('disabled');
+                    }
+                })
+            })
+        })
+
+        socket.on('win', winner => {
+            alert(`${winner} wins!`)
+            document.location.href = '/game';
+        })
+
+        startGame()
     </script>
 </body>
 </html>

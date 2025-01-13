@@ -9,15 +9,4 @@ module.exports = class Game {
         this.winner = null
         this.time = new Date().toLocaleString()
     }
-
-    ifWinner() {
-        Object.entries(this.players).forEach(([nick, player]) => {
-            const board = player.boards["self"];
-            if (board.ifAllSink()) {
-                this.winner = nick;
-                console.log(`${nick} won the game!`);
-                return true;
-            }
-        });
-    }
 }
