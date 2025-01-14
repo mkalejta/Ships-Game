@@ -62,6 +62,13 @@ app.get('/game/:id/prep', (req, res) => {
     res.render("prep.ejs");
 })
 
+app.get('/registration', (req, res) => {
+    res.render("registration.ejs")
+})
+
+app.get('/login', (req, res) => {
+    res.render("login.ejs")
+})
 
 const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
 const moves = {}; // -- || --
