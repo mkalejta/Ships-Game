@@ -30,7 +30,8 @@ class Board {
     }
 
     add_ship(ship) {
-        for (let part of ship) {
+        this.ships.push(ship)
+        for (let part of ship.parts) {
             this.board[part.position[0]][part.position[1]] = String(ship.size);
         }
     }
@@ -52,11 +53,11 @@ class Board {
     }
 
     ifAllSink() {
-        this.ships.forEach(ship => {
+        for (let ship of this.ships) {
             if (!ship.sink) {
                 return false;
             }
-        })
+        }
         return true;
     }
 };

@@ -79,6 +79,7 @@
         let OpponentBoard;
         let YourBoard;
         let OpponentShips;
+        let YourShips;
 
         const fullUrl = window.location.href;
         const urlParts = fullUrl.split('/');
@@ -98,6 +99,17 @@
             OpponentBoard = GameState.players[Player].boards["opponent"].board;
             YourBoard = GameState.players[Player].boards["self"].board;
             OpponentShips = GameState.players[Player].boards["opponent"].ships;
+            YourShips = GameState.players[Player].boards["self"].ships;
+
+            let hitParts = [];
+
+            for (let ship of YourShips) {
+                for (let part of ship.parts) {
+                    if (part.hit) {
+                        hitParts.push(part.position)
+                    }
+                }
+            }
 
             OpponentBoard.forEach((row, i) => {
                 row.forEach((field, j) => {
@@ -116,6 +128,12 @@
                     if (field === '0') {
                         cell.classList.add('miss');
                     } else if (field !== '1') {
+                        for (let part of hitParts) {
+                            if (part[0] === String(i) && part[1] === String(j)) {
+                                cell.classList.add('hit');
+                                break;
+                            }
+                        }
                         cell.classList.add('ship');
                     } else {
                         cell.classList.add('disabled');

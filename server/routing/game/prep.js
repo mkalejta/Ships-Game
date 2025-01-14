@@ -1,5 +1,6 @@
 db = require("../../db")
 const Ship = require("../../objects/Ship")
+const Board = require("../../objects/Board")
 
 module.exports = async (req, res) => {
     const gameId = req.params.id
@@ -11,13 +12,14 @@ module.exports = async (req, res) => {
     }
 
     const data = await db.getData("/games")
-    const game = data.find(g => g.id === req.params.id)
+    let game = data.find(g => g.id === req.params.id)
 
     if (!game) {
         res.status(404).json({ error: "Game was not found with given id! "})
         return;
     }
 
+    let boardObj = Object.assign(new Board(), game.players[player].boards['self']); // Zamiana danych na obiekt Board
     const opponent = getOpponent(game, player);
 
     switch (req.method) {
@@ -31,10 +33,13 @@ module.exports = async (req, res) => {
                 return;
             }
 
+            boardObj.add_ship(new Ship(parts)) // Utworzenie statków w zmiennych 'board' i 'ships'
+            game.players[player].boards['self'] = boardObj; // Aktualizacja obiektu 'game'
+
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
-                    data[i].players[player].boards["self"].ships.push(new Ship(parts))
-                    data[i].players[opponent].boards['opponent'] = data[i].players[player].boards['self']
+                    data[i] = {...game}
+                    data[i].players[opponent].boards['opponent'].ships = data[i].players[player].boards['self'].ships
                     console.log(`${player} added ship with size ${parts.length}`)
                     res.status(200).json(data[i])
                 }
@@ -46,7 +51,7 @@ module.exports = async (req, res) => {
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
                     data[i].players[player].boards["self"].ships = []
-                    data[i].players[opponent].boards['opponent'] = data[i].players[player].boards['self']
+                    data[i].players[opponent].boards['opponent'].ships = []
                     console.log(`${player}'s choices are cleared!`)
                     res.status(200).json(data[i])
                 }

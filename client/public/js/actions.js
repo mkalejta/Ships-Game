@@ -9,11 +9,16 @@ let actions = {
             alert("Please enter all the fields correctly!")
         }
     },
-    refreshGames: function() {
+    refreshGames: function(search) {
         API.getAllGames().then(response => {
             document.querySelector("#cards").innerHTML = "" // reset games
+            const regex = RegExp(search, "i")
+            console.log(regex, search)
             response.forEach(game => {
-                document.querySelector("#cards").innerHTML += utils.card(game)
+                if (regex.test(game.name)) {
+                    console.log(game.name)
+                    document.querySelector("#cards").innerHTML += utils.card(game)
+                }
             });
         }).catch(alert)
     },
