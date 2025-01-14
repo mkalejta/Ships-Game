@@ -53,8 +53,7 @@ class Board {
     }
 
     ifAllSink() {
-        for (let ship in this.ships) {
-            console.log(ship);
+        for (let ship of this.ships) {
             if (!ship.sink) {
                 return false;
             }

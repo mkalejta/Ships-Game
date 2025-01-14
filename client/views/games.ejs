@@ -8,14 +8,80 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         .card {
             width: 100%;
             min-width: 350px;
             height: 250px;
             margin: 3rem auto;
+            position: relative;
         }
 
+        .open-game:after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            bottom: -4px;
+            right: -4px;
+            border: 4px dashed white;
+            z-index: 1;
+            animation: move-border 6s linear infinite;
+        }
+
+        .open-game:hover {
+            box-shadow: 0 0 0 0 transparent;
+            transition: box-shadow 0.2s;
+        }
+        
+        .open-game:hover:after {
+            content: inherit;
+            animation: none;
+            border: inherit;
+        }
+
+        @keyframes move-border {
+            0% {
+                clip-path: inset(0 0 100% 0); /* Start na górnej krawędzi */
+            }
+            25% {
+                clip-path: inset(0 0 0 100%); /* Przesuwanie wzdłuż prawej krawędzi */
+            }
+            50% {
+                clip-path: inset(100% 0 0 0); /* Przesuwanie wzdłuż dolnej krawędzi */
+            }
+            75% {
+                clip-path: inset(0 100% 0 0); /* Przesuwanie wzdłuż lewej krawędzi */
+            }
+            100% {
+                clip-path: inset(0 0 100% 0); /* Powrót do góry */
+            }
+        }
+
+
+        div.container input[type=text] {
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid grey;
+            float: left;
+            background: #f1f1f1;
+        }
+
+        #search-button {
+            float: left;
+            padding: 10px 3rem;
+            background: #2196F3;
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+        }
+
+        #search-button:hover {
+            background: #0b7dda;
+        }
     </style>
 </head>
 <body>
@@ -23,8 +89,12 @@
     <main>
         <div class="container-fluid text-center">
             <br>
-            <div class="container">
+            <div class="container d-flex justify-content-center align-items-center gap-5">
                 <a href="/game/create"><button class="btn btn-primary" style="font-weight: bold; font-size: 1.25rem;">Create new game</button></a>
+                <div class="search-container">
+                    <input type="text" name="search" id="search" placeholder="Search game name...">
+                    <button id="search-button" type="submit"><i class="fa fa-search"></i></button>
+                </div>
             </div>
             <div class="row" id="cards" style="margin-bottom: 4rem">
 
@@ -35,7 +105,27 @@
     <script src="/js/utils.js"></script>
     <script src="/js/actions.js"></script>
     <script>
-        actions.refreshGames()
+        actions.refreshGames("")
+        
+        let SearchInput = document.getElementById('search');
+        let SearchButton = document.getElementById('search-button')
+        let Names = [];
+
+        function searchRegex(e) {
+            e.preventDefault()
+            console.log(SearchInput.value)
+            actions.refreshGames(SearchInput.value)
+        }
+        
+        SearchButton.addEventListener('click', e => {
+            searchRegex(e)
+        })
+
+        SearchInput.addEventListener('keyup', e => {
+            if (e.key === "Enter") {
+                searchRegex(e)
+            }
+        })
     </script>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"
     integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"

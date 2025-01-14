@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     }
 
     const data = await db.getData("/games")
-    const game = data.find(g => g.id === req.params.id)
+    let game = data.find(g => g.id === req.params.id)
     const opponent = getOpponent(game, player)
 
     if (!game) {
@@ -25,12 +25,12 @@ module.exports = async (req, res) => {
 
     boardObj.make_move(move); // Wykonanie ruchu
 
-
     if (boardObj.ifAllSink()) {
         game.winner = player
+        game.time = new Date().toLocaleString()
     }
     game.players[player].boards['opponent'] = boardObj; // Aktualizacja obiektu 'game'
-
+    
     let j;
     for(let i=0; i < data.length; i++) {
         if (data[i].id === req.params.id) {
