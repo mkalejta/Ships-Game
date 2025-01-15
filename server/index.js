@@ -7,8 +7,8 @@ const app = express();
 const { Server } = require('socket.io');
 const PORT = 3000;
 const { instrument } = require("@socket.io/admin-ui");
-const Player = require('./objects/Player');
-const game = require('./routing/game');
+const cookieParser = require('cookie-parser');
+require("dotenv").config();
 
 
 const expressServer = app.listen(PORT, () => {
@@ -31,10 +31,12 @@ app.set("views", path.join(__dirname, "../client/views"));
 
 app.use(express.static(path.join(__dirname, "../client/public")));
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/api", middleware, routing);
+app.use("/api", routing);
+app.use("*/game", middleware);
 
 
 // Generowanie widoków
@@ -43,6 +45,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/game', (req, res) => {
+    console.log(req.user);
     res.render("games.ejs");
 })
 

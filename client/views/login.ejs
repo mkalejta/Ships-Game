@@ -61,17 +61,13 @@
             }
     
             try {
-                const response = await fetch(`/api/login`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        nickname: nickname,
-                        password: password
-                    })
+                const response = await axios.post('/api/login', {
+                    nickname: nickname,
+                    password: password
                 });
 
-                if (response.redirected) {
-                    window.location.href = response.url;
+                if (response) {
+                    window.location.href = '/';
                 } else {
                     const errorData = await response.json();
                     alert(errorData.error || 'An error occurred.');
