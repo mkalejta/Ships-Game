@@ -34,7 +34,7 @@
     <%- include('partials/navbar') %>
     <div class="main">
         <h2>Registration</h2>
-        <form class="d-flex flex-column justify-content-center align-items-end gap-3" method="POST">
+        <form id="registrationForm" class="d-flex flex-column justify-content-center align-items-end gap-3">
             <div>
                 <label for="nickname">Nickname: </label>
                 <input type="text" name="nickname" id="nickname">
@@ -49,7 +49,39 @@
         </form>
     </div>
     <script>
-        
+        document.getElementById('registrationForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+    
+            const nickname = document.getElementById('nickname').value;
+            const password = document.getElementById('password').value;
+    
+            if (!nickname || !password) {
+                alert('Please provide your nickname and password');
+                return;
+            }
+    
+            try {
+                const response = await fetch(`/api/registration`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nickname: nickname,
+                        password: password
+                    })
+                });
+
+                if (response.redirected) {
+                    alert('Successfully registered!')
+                    window.location.href = response.url;
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.error || 'An error occurred.');
+                }
+            } catch (error) {
+                console.error('Error during registration process:', error);
+                alert('An unexpected error occurred.');
+            }
+        });
     </script>
 </body>
 </html>

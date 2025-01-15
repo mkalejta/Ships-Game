@@ -1,5 +1,8 @@
 const db = require("../db")
 const User = require('../objects/User.js')
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 
 module.exports = async (req, res) => {
     const nickname = req.body.nickname;
@@ -17,7 +20,9 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const user = new User(nickname, password);
+    let user = new User(nickname, password);
+    const hashedPassword = await hashPassword(user.password)
+    user.password = hashedPassword
 
     try {
         db.push("/users[]", user, true)
@@ -26,5 +31,13 @@ module.exports = async (req, res) => {
     } catch (error) {
         console.error("Error saving game to DB: ", error)
         return res.status(500).json({ error: "Failed to save game to DB" });
+    }
+}
+
+async function hashPassword(password) {
+    try {
+        return await bcrypt.hash(password, saltRounds);
+    } catch (err) {
+        throw new Error('Unable to hash password');
     }
 }
