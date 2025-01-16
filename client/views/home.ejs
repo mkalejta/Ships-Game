@@ -15,7 +15,10 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js"></script>
     <script>
-        
+        window.onbeforeunload = function() {
+            console.log('Other page')
+            fetch('api/logout')
+        }
     </script>
 </body>
 </html>

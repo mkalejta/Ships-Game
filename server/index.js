@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const routing = require("./routing");
-const middleware = require("./routing/middleware");
+const { middleware, resetServerStartTime } = require("./routing/middleware");
 const app = express();
 const { Server } = require('socket.io');
 const PORT = 3000;
@@ -10,6 +10,10 @@ const { instrument } = require("@socket.io/admin-ui");
 const cookieParser = require('cookie-parser');
 require("dotenv").config();
 
+
+// Obsługa restartu serwera
+process.on('SIGUSR1', resetServerStartTime);
+process.on('SIGUSR2', resetServerStartTime);
 
 const expressServer = app.listen(PORT, () => {
     console.log(`Backend listens on port ${PORT}`);
@@ -45,7 +49,6 @@ app.get('/', (req, res) => {
 });
 
 app.get('/game', (req, res) => {
-    console.log(req.user);
     res.render("games.ejs");
 })
 

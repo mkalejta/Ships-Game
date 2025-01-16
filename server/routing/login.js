@@ -24,16 +24,10 @@ module.exports = async (req, res) => {
             return res.status(400).json({ error: 'wrong password' })
         }
 
-        const payload = {
-            id: user.nickname
-        }
-
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d'});
-        return res.cookie('access_token', token, {
-            httpOnly: true
-        }).status(200).json({
-            nickname: user.nickname
-        })
+        const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+        res.cookie('accessToken', accessToken, { httpOnly: true })
+        res.status(200).json({ message: "Successfully logged in" })
+        
     } catch (err) {
         return res.status(500).json(err.message);
     }
