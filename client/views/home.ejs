@@ -12,13 +12,13 @@
     <%- include('partials/navbar') %>
     <h1>Welcome to Ships Game</h1>
     <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Asperiores obcaecati dolores voluptate tempora fugit voluptas reiciendis quo animi soluta eum?</p>
+    <script src="/js/API.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/actions.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js"></script>
     <script>
-        window.onbeforeunload = function() {
-            console.log('Other page')
-            fetch('api/logout')
-        }
+        
     </script>
 </body>
 </html>

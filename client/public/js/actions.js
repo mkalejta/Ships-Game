@@ -44,5 +44,14 @@ let actions = {
     },
     makeMove: function(player, id, move) {
         API.makeMove(player, id, move).then((res) => res).catch(alert);
+    },
+    clearCookies: function () {
+        if (!(sessionStorage.getItem("logged"))) {
+            API.logout().then((res) => res).catch(alert);
+            console.log('cookie')
+        } else {
+            console.log("not a cookie")
+        }
     }
+
 }

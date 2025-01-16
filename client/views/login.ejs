@@ -48,7 +48,18 @@
             <button class="btn btn-primary" style="font-weight: bold;">Login</button>
         </form>
     </div>
+    <script src="/js/API.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/actions.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <script>
+        let sessionId = sessionStorage.getItem('sessionId');
+
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            sessionStorage.setItem('sessionId', sessionId);
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async function (event) {
             event.preventDefault();
     
@@ -61,9 +72,10 @@
             }
     
             try {
-                const response = await axios.post('/api/login', {
-                    nickname: nickname,
-                    password: password
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId, nickname, password })
                 });
 
                 if (response) {

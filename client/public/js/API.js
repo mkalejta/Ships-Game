@@ -31,5 +31,9 @@ let API = {
     makeMove: function(player, id, move) {
         return this.api.put(`/game/${id}?player=${player}`, move)
         .then(response => response.data)
+    },
+    logout: function() {
+        return this.api.get('/logout')
+        .then(response => response.data)
     }
 }

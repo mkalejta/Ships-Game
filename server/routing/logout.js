@@ -1,5 +1,5 @@
 
 module.exports = (req, res) => {
-    res.clearCookie('access_token')
+    res.clearCookie('accessToken')
     res.status(200).json({ message: 'Logout success' })
 }

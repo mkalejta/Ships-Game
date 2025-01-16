@@ -7,21 +7,21 @@ const middleware = (req, res, next) => {
 
     if(!token) {
         console.log('No access token!')
-        return res.status(403).json({ error: 'Log in to get access!' })
+        return res.redirect('/login')
     }
 
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        console.log('Access token valid')
             
         if (decoded.iat * 1000 < serverStartTime) {
-            return res.status(401).json({ message: 'Session expired. Log in again.' });
+            return res.redirect('/login')
         }
 
+        console.log('Access token valid')
         req.user = decoded;
         next();
     } catch (err) {
-        res.status(401).json({ message: 'Invalid token.' });
+        return res.redirect('/login')
     }
 };
 
