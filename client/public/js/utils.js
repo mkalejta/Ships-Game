@@ -40,7 +40,7 @@ let utils = {
                             <h4 class="card-title text-info" style="font-style: italic; font-weight: bold;">${name}</h4>
                             <p class="card-text">Players: ${Object.values(players).map(p => " " + p.nickname)}</p>
                             <a href="/game/${id}/prep">
-                                <button class="btn btn-outline-primary" onclick="${actions.joinGame(id)}">Join game</button>
+                                <button id="${id}" class="btn btn-outline-primary" name="join-button">Join game</button>
                             <a>
                             <p class="card-text" style="font-style: italic;">Created: ${time}</p>
                         </div>

@@ -9,9 +9,10 @@ let actions = {
             alert("Please enter all the fields correctly!")
         }
     },
-    joinGame: function(id) {
-        API.joinGame(id).then((res) => {
+    joinGame: function(player, id) {
+        API.joinGame(player, id).then((response) => {
             this.refreshGames()
+            return response
         }).catch(alert)
     },
     refreshGames: function(search) {
@@ -25,18 +26,18 @@ let actions = {
             });
         }).catch(alert)
     },
-    makePrepChoice: function(id, parts) {
-        API.makePrepChoice(id, parts).then((res) => {
+    makePrepChoice: function(player, id, parts) {
+        API.makePrepChoice(player, id, parts).then((res) => {
             console.log(res);
         }).catch(alert)
     },
-    prepClear: function(id) {
-        API.clearPrepChoices(id).then((res) => {
+    prepClear: function(player, id) {
+        API.clearPrepChoices(player, id).then((res) => {
             console.log(res);
         }).catch(alert);
     },
-    prepConfirm: function(id) {
-        API.confirmPrepChoices(id).then((res) => {
+    prepConfirm: function(player, id) {
+        API.confirmPrepChoices(player ,id).then((res) => {
             console.log(res);
         }).catch(alert)
     },
@@ -45,7 +46,7 @@ let actions = {
             return {...res};
         }).catch(alert);
     },
-    makeMove: function(id, move) {
-        API.makeMove(id, move).then((res) => res).catch(alert);
+    makeMove: function(player, id, move) {
+        API.makeMove(player, id, move).then((res) => res).catch(alert);
     }
 }

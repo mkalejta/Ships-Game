@@ -59,7 +59,7 @@
         let parts = [];
 
         const urlParams = new URLSearchParams(window.location.search);
-        const Player = urlParams.get('player');
+        const Player = "<%- player %>";
         let Id;
 
         const fullUrl = window.location.href;
@@ -239,7 +239,7 @@
                 crossOutShip();
                 shipListRefresh();
                 allShipsPlaced();
-                actions.makePrepChoice(Id, { parts })
+                actions.makePrepChoice(Player, Id, { parts })
                 parts = [];
                 toggleClearButton();
                 toggleConfirmButton();
@@ -251,7 +251,7 @@
 
         ClearButton.addEventListener('click', () => {
             Cells.forEach(cell => cell.classList=[]);
-            actions.prepClear(Id)
+            actions.prepClear(Player, Id)
             parts = [];
             currentShipSizes = [...startShipSizes];
             shipListRefresh();
@@ -266,7 +266,7 @@
                 }
             });
             Info.hidden = true;
-            actions.prepConfirm(Id);
+            actions.prepConfirm(Player, Id);
             socket.emit('ready', { player: Player, gameId: Id }, (previousAlerts) => {
                 PrepAlerts.innerHTML = ''
                 previousAlerts.forEach((alert) => {

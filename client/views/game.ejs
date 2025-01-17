@@ -73,7 +73,7 @@
         let hitShip;
 
         const urlParams = new URLSearchParams(window.location.search);
-        const Player = urlParams.get('player');
+        const Player = "<%- player %>";
         let Id;
         let GameState;
         let OpponentBoard;
@@ -167,7 +167,7 @@
         Cells.forEach(field => field.addEventListener('click', async () => {
             const [ row, col ] = [field.attributes['data-row'].value, field.attributes['data-col'].value];
             move = [ row, col ];
-            await actions.makeMove(Id, { move });
+            await actions.makeMove(Player, Id, { move });
             await refreshGameState();
             socket.emit('move', { player: Player, move, gameId: Id }, () => {
                 if (ifHit(move) && ifSink()) {

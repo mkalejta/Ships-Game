@@ -107,15 +107,15 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js"></script>
     <script>
+        const Player = "<%- player %>";
         actions.refreshGames("")
         
-        let SearchInput = document.getElementById('search');
+        let SearchInput = document.getElementById('search')
         let SearchButton = document.getElementById('search-button')
         let Names = [];
 
         function searchRegex(e) {
             e.preventDefault()
-            console.log(SearchInput.value)
             actions.refreshGames(SearchInput.value)
         }
         
@@ -126,6 +126,37 @@
         SearchInput.addEventListener('keyup', e => {
             if (e.key === "Enter") {
                 searchRegex(e)
+            }
+        })
+
+        document.addEventListener("DOMContentLoaded", e => {
+            e.preventDefault()
+            let JoinButtons = document.querySelectorAll('#cards [name=join-button]')
+            console.log(JoinButtons);
+            for (let button of JoinButtons) {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault()
+                    try {
+                        const response = await fetch(`/api/game/${button.id}/join`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ player: Player })
+                        });
+
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else if (response.ok) {
+                            const data = await response.json();
+                            alert(data.message || 'Successfully joined the game!');
+                        } else {
+                            const errorData = await response.json();
+                            alert(errorData.error || 'An error occurred.');
+                        }
+                        } catch (error) {
+                            console.error('Error while joining the game:', error);
+                            alert('An unexpected error occurred.');
+                        }
+                })
             }
         })
     </script>

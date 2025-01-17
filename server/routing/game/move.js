@@ -1,11 +1,10 @@
 db = require("../../db")
 const Board = require("../../objects/Board.js")
 const Ship = require("../../objects/Ship.js")
-const jwt = require('jsonwebtoken')
 
 module.exports = async (req, res) => {
     const move = req.body.move
-    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    const player = req.body.player
 
     if (!move || !player) {
         res.status(400).json({ error: "Move and player have to be given!" })

@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 
 module.exports = async (req, res) => {
     const gameId = req.params.id
-    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    const player = req.body.player
 
     if (!gameId || !player) {
         res.status(400).json({ error: "Id and player have to be given!" })

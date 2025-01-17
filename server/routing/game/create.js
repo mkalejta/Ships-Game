@@ -19,7 +19,7 @@ module.exports = (req, res) => {
     try {
         db.push("/games[]", game, true)
         console.log(`${creator} has created a game.`)
-        res.redirect(`/game/${game.id}/prep?player=${creator}`)
+        res.redirect(`/game/${game.id}/prep`)
     } catch (error) {
         console.error("Error saving game to DB: ", error)
         return res.status(500).json({ error: "Failed to save game to DB" });

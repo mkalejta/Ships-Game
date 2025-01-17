@@ -8,6 +8,7 @@ const { Server } = require('socket.io');
 const PORT = 3000;
 const { instrument } = require("@socket.io/admin-ui");
 const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken')
 require("dotenv").config();
 
 
@@ -45,11 +46,13 @@ app.use("*/game", middleware);
 
 // Generowanie widoków
 app.get('/', (req, res) => {
-    res.render("home.ejs");
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    res.render("home.ejs", { player });
 });
 
 app.get('/game', (req, res) => {
-    res.render("games.ejs");
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    res.render("games.ejs", { player });
 })
 
 app.get('/game/create', (req, res) => {
@@ -61,11 +64,13 @@ app.get('/game/create', (req, res) => {
 // })
 
 app.get('/game/:id', (req, res) => {
-    res.render("game.ejs");
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    res.render("game.ejs", { player });
 })
 
 app.get('/game/:id/prep', (req, res) => {
-    res.render("prep.ejs");
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    res.render("prep.ejs", { player });
 })
 
 app.get('/registration', (req, res) => {
