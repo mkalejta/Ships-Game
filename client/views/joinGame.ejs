@@ -58,7 +58,7 @@
     
             try {
 
-                const response = await fetch(`/api/game/${Id}/join?joiner=${joiner}`, {
+                const response = await fetch(`/api/game/${Id}/join`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                 });

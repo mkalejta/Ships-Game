@@ -53,13 +53,6 @@
     <script src="/js/actions.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <script>
-        let sessionId = sessionStorage.getItem('sessionId');
-
-        if (!sessionId) {
-            sessionId = crypto.randomUUID();
-            sessionStorage.setItem('sessionId', sessionId);
-        }
-
         document.getElementById('loginForm').addEventListener('submit', async function (event) {
             event.preventDefault();
     
@@ -75,7 +68,7 @@
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sessionId, nickname, password })
+                    body: JSON.stringify({ nickname, password })
                 });
 
                 if (response) {

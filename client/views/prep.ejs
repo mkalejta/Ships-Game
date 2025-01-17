@@ -239,7 +239,7 @@
                 crossOutShip();
                 shipListRefresh();
                 allShipsPlaced();
-                actions.makePrepChoice(Player, Id, { parts })
+                actions.makePrepChoice(Id, { parts })
                 parts = [];
                 toggleClearButton();
                 toggleConfirmButton();
@@ -251,7 +251,7 @@
 
         ClearButton.addEventListener('click', () => {
             Cells.forEach(cell => cell.classList=[]);
-            actions.prepClear(Player, Id)
+            actions.prepClear(Id)
             parts = [];
             currentShipSizes = [...startShipSizes];
             shipListRefresh();
@@ -266,7 +266,7 @@
                 }
             });
             Info.hidden = true;
-            actions.prepConfirm(Player, Id);
+            actions.prepConfirm(Id);
             socket.emit('ready', { player: Player, gameId: Id }, (previousAlerts) => {
                 PrepAlerts.innerHTML = ''
                 previousAlerts.forEach((alert) => {
@@ -303,7 +303,7 @@
             const ifStart = await ifGameStart();
             if (ifStart) {
                 setTimeout(() => {
-                    document.location.href = `/game/${Id}?player=${Player}`;
+                    document.location.href = `/game/${Id}`;
                 }, 3000);
             }
         })

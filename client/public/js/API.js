@@ -12,8 +12,8 @@ let API = {
         return this.api.post(`/game/create`)
         .then(response => response.data)
     },
-    joinGame: function(joiner, id) {
-        return this.api.put(`/game/${id}/join?joiner=${joiner}`)
+    joinGame: function(id) {
+        return this.api.put(`/game/${id}/join`)
         .then(response => response)
     },
     makePrepChoice: function(player, id, parts) {

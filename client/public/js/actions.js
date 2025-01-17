@@ -9,31 +9,34 @@ let actions = {
             alert("Please enter all the fields correctly!")
         }
     },
+    joinGame: function(id) {
+        API.joinGame(id).then((res) => {
+            this.refreshGames()
+        }).catch(alert)
+    },
     refreshGames: function(search) {
         API.getAllGames().then(response => {
             document.querySelector("#cards").innerHTML = "" // reset games
             const regex = RegExp(search, "i")
-            console.log(regex, search)
             response.forEach(game => {
                 if (regex.test(game.name)) {
-                    console.log(game.name)
                     document.querySelector("#cards").innerHTML += utils.card(game)
                 }
             });
         }).catch(alert)
     },
-    makePrepChoice: function(player, id, parts) {
-        API.makePrepChoice(player, id, parts).then((res) => {
+    makePrepChoice: function(id, parts) {
+        API.makePrepChoice(id, parts).then((res) => {
             console.log(res);
         }).catch(alert)
     },
-    prepClear: function(player, id) {
-        API.clearPrepChoices(player, id).then((res) => {
+    prepClear: function(id) {
+        API.clearPrepChoices(id).then((res) => {
             console.log(res);
         }).catch(alert);
     },
-    prepConfirm: function(player, id) {
-        API.confirmPrepChoices(player, id).then((res) => {
+    prepConfirm: function(id) {
+        API.confirmPrepChoices(id).then((res) => {
             console.log(res);
         }).catch(alert)
     },
@@ -42,16 +45,7 @@ let actions = {
             return {...res};
         }).catch(alert);
     },
-    makeMove: function(player, id, move) {
-        API.makeMove(player, id, move).then((res) => res).catch(alert);
-    },
-    clearCookies: function () {
-        if (!(sessionStorage.getItem("logged"))) {
-            API.logout().then((res) => res).catch(alert);
-            console.log('cookie')
-        } else {
-            console.log("not a cookie")
-        }
+    makeMove: function(id, move) {
+        API.makeMove(id, move).then((res) => res).catch(alert);
     }
-
 }

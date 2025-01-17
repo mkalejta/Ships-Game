@@ -1,9 +1,10 @@
 const db = require("../../db")
 const Game = require("../../objects/Game.js")
 const Player = require("../../objects/Player.js")
+const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {
-    const creator = req.body.creator
+    const creator = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
     const gameName = req.body.gameName
 
     if (!creator || !gameName) {

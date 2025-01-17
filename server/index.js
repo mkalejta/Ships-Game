@@ -56,9 +56,9 @@ app.get('/game/create', (req, res) => {
     res.render("createGame.ejs");
 })
 
-app.get('/game/:id/join', (req, res) => {
-    res.render('joinGame.ejs');
-})
+// app.get('/game/:id/join', (req, res) => {
+//     res.render('joinGame.ejs');
+// })
 
 app.get('/game/:id', (req, res) => {
     res.render("game.ejs");

@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 
 module.exports = async (req, res) => {
     try {
-        const sessionId = req.body.sessionId;
         const nickname = req.body.nickname;
         const password = req.body.password;
     
@@ -25,7 +24,7 @@ module.exports = async (req, res) => {
             return res.status(400).json({ error: 'wrong password' })
         }
 
-        const accessToken = jwt.sign({ nickname, sessionId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+        const accessToken = jwt.sign({ nickname }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
         res.cookie('accessToken', accessToken, { httpOnly: true })
         res.status(200).json({ message: "Successfully logged in" })
         
