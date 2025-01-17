@@ -9,14 +9,18 @@ let actions = {
             alert("Please enter all the fields correctly!")
         }
     },
+    joinGame: function(player, id) {
+        API.joinGame(player, id).then((response) => {
+            this.refreshGames()
+            return response
+        }).catch(alert)
+    },
     refreshGames: function(search) {
         API.getAllGames().then(response => {
             document.querySelector("#cards").innerHTML = "" // reset games
             const regex = RegExp(search, "i")
-            console.log(regex, search)
             response.forEach(game => {
                 if (regex.test(game.name)) {
-                    console.log(game.name)
                     document.querySelector("#cards").innerHTML += utils.card(game)
                 }
             });
@@ -33,7 +37,7 @@ let actions = {
         }).catch(alert);
     },
     prepConfirm: function(player, id) {
-        API.confirmPrepChoices(player, id).then((res) => {
+        API.confirmPrepChoices(player ,id).then((res) => {
             console.log(res);
         }).catch(alert)
     },

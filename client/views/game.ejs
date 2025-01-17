@@ -73,7 +73,7 @@
         let hitShip;
 
         const urlParams = new URLSearchParams(window.location.search);
-        const Player = urlParams.get('player');
+        const Player = "<%- player %>";
         let Id;
         let GameState;
         let OpponentBoard;

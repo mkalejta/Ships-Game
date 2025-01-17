@@ -2,14 +2,19 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const routing = require("./routing");
-const middleware = require("./routing/middleware");
+const { middleware, resetServerStartTime } = require("./routing/middleware");
 const app = express();
 const { Server } = require('socket.io');
 const PORT = 3000;
 const { instrument } = require("@socket.io/admin-ui");
-const Player = require('./objects/Player');
-const game = require('./routing/game');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken')
+require("dotenv").config();
 
+
+// Obsługa restartu serwera
+process.on('SIGUSR1', resetServerStartTime);
+process.on('SIGUSR2', resetServerStartTime);
 
 const expressServer = app.listen(PORT, () => {
     console.log(`Backend listens on port ${PORT}`);
@@ -31,37 +36,50 @@ app.set("views", path.join(__dirname, "../client/views"));
 
 app.use(express.static(path.join(__dirname, "../client/public")));
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/api", middleware, routing);
+app.use("/api", routing);
+app.use("*/game", middleware);
 
 
 // Generowanie widoków
 app.get('/', (req, res) => {
-    res.render("home.ejs");
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    res.render("home.ejs", { player });
 });
 
 app.get('/game', (req, res) => {
-    res.render("games.ejs");
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    res.render("games.ejs", { player });
 })
 
 app.get('/game/create', (req, res) => {
     res.render("createGame.ejs");
 })
 
-app.get('/game/:id/join', (req, res) => {
-    res.render('joinGame.ejs');
-})
+// app.get('/game/:id/join', (req, res) => {
+//     res.render('joinGame.ejs');
+// })
 
 app.get('/game/:id', (req, res) => {
-    res.render("game.ejs");
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    res.render("game.ejs", { player });
 })
 
 app.get('/game/:id/prep', (req, res) => {
-    res.render("prep.ejs");
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    res.render("prep.ejs", { player });
 })
 
+app.get('/registration', (req, res) => {
+    res.render("registration.ejs")
+})
+
+app.get('/login', (req, res) => {
+    res.render("login.ejs")
+})
 
 const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
 const moves = {}; // -- || --

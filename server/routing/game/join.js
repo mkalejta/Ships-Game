@@ -2,19 +2,20 @@ const db = require("../../db")
 const Player = require("../../objects/Player")
 
 module.exports = async (req, res) => {
-    const joiner = req.query.joiner
+    const joiner = req.body.player
+    console.log(req.body)
+
+    console.log(joiner)
 
     if (!joiner || joiner === 'null') {
-        res.status(400).json({ error: "Joiner's name is needed!" })
-        return;
+        return res.status(400).json({ error: "Joiner's name is needed!" })
     }
 
     let data = await db.getData("/games")
     const game = data.find(g => g.id === req.params.id)
 
     if (!game) {
-        res.status(404).json({ error: "Game was not found with that id" })
-        return;
+        return res.status(404).json({ error: "Game was not found with that id" })
     }
 
     if (Object.keys(game.players).length === 1) {
@@ -25,15 +26,15 @@ module.exports = async (req, res) => {
                 console.log(`${joiner} has joined a game ${data[i].name}`)
             }
         }
+
         try {
-            db.push("/games", data) // Aktualizacja bazy danych o polu 'games'
-            res.redirect(`/game/${game.id}/prep?player=${joiner}`)
+            await db.push("/games", data)
+            res.redirect(`/game/${game.id}/prep`)
         } catch (error) {
             console.error("Error saving game to DB: ", error)
             return res.status(500).json({ error: "Failed to save game to DB" });
         }
     } else {
-        res.status(400).json({ error: "Game is already full of players!" })
-        return;
+        return res.status(400).json({ error: "Game is already full of players!" })
     }
 }

@@ -1,9 +1,10 @@
 const db = require("../../db")
 const Game = require("../../objects/Game.js")
 const Player = require("../../objects/Player.js")
+const jwt = require('jsonwebtoken')
 
 module.exports = (req, res) => {
-    const creator = req.body.creator
+    const creator = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
     const gameName = req.body.gameName
 
     if (!creator || !gameName) {
@@ -18,7 +19,7 @@ module.exports = (req, res) => {
     try {
         db.push("/games[]", game, true)
         console.log(`${creator} has created a game.`)
-        res.redirect(`/game/${game.id}/prep?player=${creator}`)
+        res.redirect(`/game/${game.id}/prep`)
     } catch (error) {
         console.error("Error saving game to DB: ", error)
         return res.status(500).json({ error: "Failed to save game to DB" });

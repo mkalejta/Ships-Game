@@ -59,7 +59,7 @@
         let parts = [];
 
         const urlParams = new URLSearchParams(window.location.search);
-        const Player = urlParams.get('player');
+        const Player = "<%- player %>";
         let Id;
 
         const fullUrl = window.location.href;
@@ -303,7 +303,7 @@
             const ifStart = await ifGameStart();
             if (ifStart) {
                 setTimeout(() => {
-                    document.location.href = `/game/${Id}?player=${Player}`;
+                    document.location.href = `/game/${Id}`;
                 }, 3000);
             }
         })
