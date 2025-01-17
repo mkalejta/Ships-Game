@@ -46,8 +46,7 @@ app.use("*/game", middleware);
 
 // Generowanie widoków
 app.get('/', (req, res) => {
-    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
-    res.render("home.ejs", { player });
+    res.render("home.ejs");
 });
 
 app.get('/game', (req, res) => {
