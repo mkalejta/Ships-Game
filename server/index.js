@@ -59,10 +59,6 @@ app.get('/game/create', (req, res) => {
     res.render("createGame.ejs");
 })
 
-// app.get('/game/:id/join', (req, res) => {
-//     res.render('joinGame.ejs');
-// })
-
 app.get('/game/:id', (req, res) => {
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
     res.render("game.ejs", { player });

@@ -1,19 +1,14 @@
 let actions = {
-    createGame: function() {
-        const inputs = utils.promptUser(["Name: ", "Game name: "])
+    createGame: function(player) {
+        const inputs = utils.promptUser(["Game name: "])
         if (inputs.every(e => e)) {
-            API.createGame(...inputs).then((res) => {
+            return API.createGame(player, ...inputs).then((res) => {
                 this.refreshGames()
+                return res
             }).catch(alert)
         } else {
             alert("Please enter all the fields correctly!")
         }
-    },
-    joinGame: function(player, id) {
-        API.joinGame(player, id).then((response) => {
-            this.refreshGames()
-            return response
-        }).catch(alert)
     },
     refreshGames: function(search) {
         API.getAllGames().then(response => {

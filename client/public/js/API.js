@@ -8,16 +8,18 @@ let API = {
         return this.api.get(`/game/`)
             .then(response => response.data)
     },
-    createGame: function() {
-        return this.api.post(`/game/create`, player)
-        .then(response => response.data)
+    createGame: function(player, gameName) {
+        return this.api.post(`/game/`, {...player, gameName})
+        .then(response => {
+            return response.request.responseURL
+        })
     },
     joinGame: function(player, id) {
         return this.api.put(`/game/${id}/join`, player)
         .then(response => response)
     },
     makePrepChoice: function(player, id, parts) {
-        return this.api.put(`/game/${id}/prep`, parts, player)
+        return this.api.put(`/game/${id}/prep`, {...parts, player})
         .then(response => response.data)
     },
     clearPrepChoices: function(player, id) {
@@ -29,7 +31,7 @@ let API = {
         .then(response => response.data)
     },
     makeMove: function(player, id, move) {
-        return this.api.put(`/game/${id}`, move, player)
+        return this.api.put(`/game/${id}`, {...move, player})
         .then(response => response.data)
     },
     logout: function() {

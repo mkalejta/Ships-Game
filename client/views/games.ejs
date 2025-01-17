@@ -90,7 +90,7 @@
         <div class="container-fluid text-center">
             <br>
             <div class="container d-flex justify-content-center align-items-center gap-5">
-                <a href="/game/create"><button class="btn btn-primary" style="font-weight: bold; font-size: 1.25rem;">Create new game</button></a>
+                <button id="create-button" class="btn btn-primary" style="font-weight: bold; font-size: 1.25rem;">Create game</button>
                 <div class="search-container">
                     <input type="text" name="search" id="search" placeholder="Search game name...">
                     <button id="search-button" type="submit"><i class="fa fa-search"></i></button>
@@ -109,6 +109,8 @@
     <script>
         const Player = "<%- player %>";
         actions.refreshGames("")
+
+        const CreateButton = document.getElementById('create-button')
         
         let SearchInput = document.getElementById('search')
         let SearchButton = document.getElementById('search-button')
@@ -119,7 +121,7 @@
             actions.refreshGames(SearchInput.value)
         }
         
-        SearchButton.addEventListener('click', e => {
+        SearchButton.addEventListener('onclick', e => {
             searchRegex(e)
         })
 
@@ -129,10 +131,15 @@
             }
         })
 
-        document.addEventListener("DOMContentLoaded", e => {
+        CreateButton.addEventListener('click', async (e) => {
+            e.preventDefault()
+            const redirect = await actions.createGame({ player: Player })
+            window.location.href = redirect
+        })
+
+        document.addEventListener("DOMContentLoaded", async (e) => {
             e.preventDefault()
             let JoinButtons = document.querySelectorAll('#cards [name=join-button]')
-            console.log(JoinButtons);
             for (let button of JoinButtons) {
                 button.addEventListener('click', async (e) => {
                     e.preventDefault()
@@ -140,22 +147,22 @@
                         const response = await fetch(`/api/game/${button.id}/join`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ player: Player })
+                            body: JSON.stringify({
+                                player: Player
+                            })
                         });
 
                         if (response.redirected) {
+                            await actions.refreshGames("");
                             window.location.href = response.url;
-                        } else if (response.ok) {
-                            const data = await response.json();
-                            alert(data.message || 'Successfully joined the game!');
                         } else {
                             const errorData = await response.json();
                             alert(errorData.error || 'An error occurred.');
                         }
-                        } catch (error) {
-                            console.error('Error while joining the game:', error);
-                            alert('An unexpected error occurred.');
-                        }
+                    } catch (error) {
+                        console.error('Error during joining game:', error);
+                        alert('An unexpected error occurred.');
+                    }
                 })
             }
         })
