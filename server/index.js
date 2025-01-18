@@ -68,11 +68,7 @@ app.get('/', (req, res) => {
 
 app.get('/game', (req, res) => {
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
-    res.render("games.ejs", { player, newGame });
-})
-
-app.get('/game/create', (req, res) => {
-    res.render("createGame.ejs");
+    res.render("games.ejs", { player });
 })
 
 app.get('/game/:id', (req, res) => {
@@ -91,6 +87,13 @@ app.get('/registration', (req, res) => {
 
 app.get('/login', (req, res) => {
     res.render("login.ejs")
+})
+
+app.get('/ranking', async (req, res) => {
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    const db = require('./db.js')
+    const ranking = await db.getData('/ranking')
+    res.render("ranking.ejs", { ranking, player })
 })
 
 const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
