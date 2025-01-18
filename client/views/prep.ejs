@@ -266,7 +266,7 @@
                 }
             });
             Info.hidden = true;
-            actions.prepConfirm(Player, Id);
+            actions.prepConfirm({player: Player}, Id);
             socket.emit('ready', { player: Player, gameId: Id }, (previousAlerts) => {
                 PrepAlerts.innerHTML = ''
                 previousAlerts.forEach((alert) => {

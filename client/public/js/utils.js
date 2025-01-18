@@ -39,9 +39,7 @@ let utils = {
                         <div class="card-body d-flex flex-column justify-content-evenly align-items-center">
                             <h4 class="card-title text-info" style="font-style: italic; font-weight: bold;">${name}</h4>
                             <p class="card-text">Players: ${Object.values(players).map(p => " " + p.nickname)}</p>
-                            <a href="/game/${id}/prep">
-                                <button id="${id}" class="btn btn-outline-primary" name="join-button">Join game</button>
-                            <a>
+                            <button id="${id}" class="btn btn-outline-primary" name="join-button">Join game</button>
                             <p class="card-text" style="font-style: italic;">Created: ${time}</p>
                         </div>
                     </div>
