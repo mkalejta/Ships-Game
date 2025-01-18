@@ -5,11 +5,11 @@ let API = {
             .then(response => response.data)
     },
     getAllGames: function() {
-        return this.api.get(`/game/`)
+        return this.api.get(`/game`)
             .then(response => response.data)
     },
     createGame: function(player, gameName) {
-        return this.api.post(`/game/`, {...player, gameName})
+        return this.api.post(`/game`, {...player, gameName})
         .then(response => {
             return response.request.responseURL
         })

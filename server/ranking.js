@@ -12,7 +12,7 @@ mqttClient.on("message", async (topic, message) => {
 
     if (topic === Topic) {
             
-        if(!data.includes(winner)) {
+        if(!data.map(obj => Object.keys(obj)[0]).includes(winner)) {
             data.push({[winner]: 0})
         }
     

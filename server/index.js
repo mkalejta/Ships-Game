@@ -46,11 +46,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api", routing);
 app.use("*/game", middleware);
 
-
 const endGameTopic = "endGame";
 
 mqttClient.subscribe(endGameTopic, () => {
-    console.log(`Zasubksrybowano endGame`)
+    console.log(`Zasubksrybowano newGame i endGame`)
 })
 
 mqttClient.on("message", (topic, message) => {
@@ -58,6 +57,7 @@ mqttClient.on("message", (topic, message) => {
 
     if (topic === endGameTopic) {
         mqttClient.publish("ranking", winner)
+        mqttClient.publish("winner", winner)
     }
 })
 
@@ -69,7 +69,7 @@ app.get('/', (req, res) => {
 
 app.get('/game', async (req, res) => {
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
-    const games = await db.getData('/games')
+    const games = await db.getData('/games');
     res.render("games.ejs", { player: player, games: games });
 })
 
@@ -149,10 +149,6 @@ io.on('connection', socket => {
 
     socket.on('miss', ({ gameId }) => {
         io.to(gameId).except(socket.id).emit('your turn')
-    })
-
-    socket.on('winner', ({ gameId, winner }) => {
-        io.to(gameId).emit('win', winner)
     })
 
     socket.on('join game', ({ player, gameId }, cb) => {

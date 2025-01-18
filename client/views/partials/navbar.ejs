@@ -17,6 +17,20 @@
         text-transform: uppercase;
         letter-spacing: 4px;
     }
+
+    #notifications {
+        position: absolute;
+        right: -8px;
+        top: 0;
+        display: flex;
+        justify-content: flex-end;
+        color: red;
+        font-weight: bold;
+        font-size: smaller;
+        border-radius: 1rem;
+        padding-left: 4px;
+    }
+
 </style>
 <nav class="navbar sticky-top navbar-expand-lg">
     <div class="container-fluid p-2-inline">
@@ -26,7 +40,8 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/">Home</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" style="position: relative;">
+                    <div id="notifications"></div>
                     <a class="nav-link" href="/game">Games</a>
                 </li>
                 <li class="nav-item dropdown">

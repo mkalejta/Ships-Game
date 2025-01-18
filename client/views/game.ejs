@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/style/game.css">
     <title>Game Phase</title>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -87,6 +88,31 @@
         if (gameIndex !== -1 && urlParts[gameIndex + 1]) {
             Id = urlParts[gameIndex + 1].split('?')[0];
         }
+
+        client.on('connect', () => {
+            console.log('Połączono z brokerem MQTT (klient)');
+
+            client.subscribe('winner', (err) => {
+                if (!err) {
+                    console.log('Subskrybowano temat: winner');
+                } else {
+                    console.error('Błąd subskrypcji:', err);
+                }
+            });
+        });
+
+        client.on('message', (topic, message) => {
+            if (topic === 'winner') {
+                const winner = message.toString();
+                console.log('Otrzymano zwycięzcę:', winner);
+                alert(`${winner} wins!`)
+                document.location.href = '/game';
+            }
+        });
+
+        client.on('error', (error) => {
+            console.error('Błąd MQTT:', error);
+        });
 
         function getOpponent(game, player) {
             let opponent = Object.keys(game.players).filter(name => name !== player)[0]
@@ -188,8 +214,6 @@
                     socket.emit('miss', { gameId: Id })
                 }
             });
-            
-            ifWinner();
         }))
 
         function ifHit(move) {
@@ -204,12 +228,6 @@
 
         function ifSink() {
             return hitShip.sink
-        }
-
-        function ifWinner() {
-            if (GameState.winner) {
-                socket.emit('winner', { gameId: Id, winner: GameState.winner })
-            }
         }
 
         function newMessage(message) {
@@ -249,11 +267,6 @@
                     }
                 })
             })
-        })
-
-        socket.on('win', winner => {
-            alert(`${winner} wins!`)
-            document.location.href = '/game';
         })
 
         startGame()

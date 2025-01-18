@@ -1,5 +1,5 @@
 const mqtt = require("mqtt");
-const brokerUrl = "mqtt://broker.hivemq.com"; // Publiczny broker MQTT
+const brokerUrl = "mqtt://test.mosquitto.org"; // Publiczny broker MQTT
 
 const client = mqtt.connect(brokerUrl);
 
