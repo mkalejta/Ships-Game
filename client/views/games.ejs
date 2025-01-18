@@ -107,10 +107,10 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js"></script>
     <script>
-        const Player = "<%- player %>";
         actions.refreshGames("")
-
         const CreateButton = document.getElementById('create-button')
+        const Player = "<%- player %>";
+        const newGame = "<%- newGame %>";
         
         let SearchInput = document.getElementById('search')
         let SearchButton = document.getElementById('search-button')

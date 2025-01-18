@@ -8,7 +8,9 @@ const { Server } = require('socket.io');
 const PORT = 3000;
 const { instrument } = require("@socket.io/admin-ui");
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const mqttClient = require('./mqttConfig');
+const ranking = require('./ranking');
 require("dotenv").config();
 
 
@@ -44,6 +46,21 @@ app.use("/api", routing);
 app.use("*/game", middleware);
 
 
+const endGameTopic = "endGame";
+
+mqttClient.subscribe(endGameTopic, () => {
+    console.log(`Zasubksrybowano nowy topic endGame`)
+})
+
+mqttClient.on("message", (topic, message) => {
+    const winner = message.toString();
+
+    if (topic === endGameTopic) {
+        mqttClient.publish("ranking", winner)
+    }
+})
+
+
 // Generowanie widoków
 app.get('/', (req, res) => {
     res.render("home.ejs");
@@ -51,7 +68,7 @@ app.get('/', (req, res) => {
 
 app.get('/game', (req, res) => {
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
-    res.render("games.ejs", { player });
+    res.render("games.ejs", { player, newGame });
 })
 
 app.get('/game/create', (req, res) => {
