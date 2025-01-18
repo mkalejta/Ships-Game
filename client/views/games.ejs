@@ -107,17 +107,19 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js"></script>
     <script>
-        actions.refreshGames("")
         const CreateButton = document.getElementById('create-button')
-        const Player = "<%- player %>";
+        const Player = "<%- player %>"
+        const Games = JSON.parse('<%- JSON.stringify(games) %>');
         
         let SearchInput = document.getElementById('search')
         let SearchButton = document.getElementById('search-button')
         let Names = [];
+        
+        actions.refreshGames(Games, "")
 
         function searchRegex(e) {
             e.preventDefault()
-            actions.refreshGames(SearchInput.value)
+            actions.refreshGames(Games, SearchInput.value)
         }
         
         SearchButton.addEventListener('onclick', e => {
@@ -152,7 +154,6 @@
                         });
 
                         if (response.redirected) {
-                            await actions.refreshGames("");
                             window.location.href = response.url;
                         } else {
                             const errorData = await response.json();
@@ -165,6 +166,18 @@
                 })
             }
         })
+
+        const fetchGames = async () => {
+            try {
+                const response = await fetch("/api/game");
+                const data = await response.json();
+                games = data;
+            } catch (error) {
+                console.error("Błąd pobierania danych:", error);
+            }
+        };
+
+        setInterval(fetchGames, 5000);
     </script>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"
     integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"

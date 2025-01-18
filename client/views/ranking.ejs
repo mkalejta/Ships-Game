@@ -66,11 +66,22 @@
             try {
                 const response = await fetch("/api/rankingData");
                 const data = await response.json();
-                ranking = data;
+                ranking = sortRanking(data);
             } catch (error) {
                 console.error("Błąd pobierania danych:", error);
             }
         };
+
+        const sortRanking = (array) => array.sort((a, b) => {
+            const [keyA, valueA] = Object.entries(a)[0];
+            const [keyB, valueB] = Object.entries(b)[0];
+
+            if (valueA !== valueB) {
+                return valueB - valueA;
+            }
+
+            return keyA.localeCompare(keyB);
+        });
 
         setInterval(fetchData, 5000);
 

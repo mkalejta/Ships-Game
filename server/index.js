@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const mqttClient = require('./mqttConfig');
 const ranking = require('./ranking');
+const db = require('./db.js')
 require("dotenv").config();
 
 
@@ -49,7 +50,7 @@ app.use("*/game", middleware);
 const endGameTopic = "endGame";
 
 mqttClient.subscribe(endGameTopic, () => {
-    console.log(`Zasubksrybowano nowy topic endGame`)
+    console.log(`Zasubksrybowano endGame`)
 })
 
 mqttClient.on("message", (topic, message) => {
@@ -66,9 +67,10 @@ app.get('/', (req, res) => {
     res.render("home.ejs");
 });
 
-app.get('/game', (req, res) => {
+app.get('/game', async (req, res) => {
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
-    res.render("games.ejs", { player });
+    const games = await db.getData('/games')
+    res.render("games.ejs", { player: player, games: games });
 })
 
 app.get('/game/:id', (req, res) => {
@@ -91,7 +93,6 @@ app.get('/login', (req, res) => {
 
 app.get('/ranking', async (req, res) => {
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
-    const db = require('./db.js')
     const ranking = await db.getData('/ranking')
     res.render("ranking.ejs", { ranking, player })
 })
