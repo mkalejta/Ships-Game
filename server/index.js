@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 const routing = require("./routing");
@@ -32,6 +33,8 @@ instrument(io, {
     auth: false
 });
 
+app.use(cors()); 
+
 
 // Ustawienia widoków
 app.set("view engine", "ejs");
@@ -49,7 +52,7 @@ app.use("*/game", middleware);
 const endGameTopic = "endGame";
 
 mqttClient.subscribe(endGameTopic, () => {
-    console.log(`Zasubksrybowano newGame i endGame`)
+    console.log(`Zasubksrybowano endGame`)
 })
 
 mqttClient.on("message", (topic, message) => {
@@ -95,6 +98,10 @@ app.get('/ranking', async (req, res) => {
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
     const ranking = await db.getData('/ranking')
     res.render("ranking.ejs", { ranking, player })
+})
+
+app.get('/instructions', (req, res) => {
+    res.render("instructions.ejs")
 })
 
 const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
@@ -178,7 +185,7 @@ io.on('connection', socket => {
             io.to(gameId).emit('add alert', alert)
         }
 
-        io.to(gameId).emit('start game')
+        // io.to(gameId).emit('start game')
 
         cb(alerts[gameId])
     })

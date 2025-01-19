@@ -55,7 +55,7 @@
         let Info = document.getElementsByClassName('info')[0];
         let PrepAlerts = document.getElementById('prep-alerts');
 
-        let startShipSizes = [2, 2, 2, 3, 3, 4];
+        let startShipSizes = [2, 2, 2, 2, 3, 3, 3, 4, 4, 5];
         let currentShipSizes = [...startShipSizes];
         let parts = [];
 
@@ -69,6 +69,26 @@
         if (gameIndex !== -1 && urlParts[gameIndex + 1]) {
             Id = urlParts[gameIndex + 1];
         }
+
+        client.on('connect', () => {
+            console.log('Połączono z brokerem MQTT (klient)');
+
+            client.subscribe('game/start', (err) => {
+                if (!err) {
+                    console.log('Subskrybowano temat: game/start');
+                } else {
+                    console.error('Błąd subskrypcji:', err);
+                }
+            });
+        });
+
+        client.on("message", (topic, message) => {
+            if(topic === 'game/start') {
+                setTimeout(() => {
+                    document.location.href = `/game/${Id}`;
+                }, 2000);
+            }
+        })
 
         function validateShip() {
             let dist = 0;
@@ -291,23 +311,23 @@
             });
         }
 
-        async function ifGameStart() {
-            const GameState = await actions.gameState(Id).then(data => data)
-            return Object.values({...GameState}.players).map(player => player.ready).every(val => val === true)
-        }
-
         socket.on('add alert', alert => {
             newAlert(alert)
         })
 
-        socket.on('start game', async () => {
-            const ifStart = await ifGameStart();
-            if (ifStart) {
-                setTimeout(() => {
-                    document.location.href = `/game/${Id}`;
-                }, 3000);
-            }
-        })
+        // async function ifGameStart() {
+        //     const GameState = await actions.gameState(Id).then(data => data)
+        //     return Object.values({...GameState}.players).map(player => player.ready).every(val => val === true)
+        // }
+
+        // socket.on('start game', async () => {
+        //     const ifStart = await ifGameStart();
+        //     if (ifStart) {
+        //         setTimeout(() => {
+        //             document.location.href = `/game/${Id}`;
+        //         }, 3000);
+        //     }
+        // })
 
         roomJoining();
     </script>
