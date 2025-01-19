@@ -1,6 +1,7 @@
 const db = require("../db");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mqttClient = require('../mqttConfig.js');
 
 module.exports = async (req, res) => {
     try {
@@ -24,7 +25,10 @@ module.exports = async (req, res) => {
             return res.status(400).json({ error: 'wrong password' })
         }
 
-        const accessToken = jwt.sign({ nickname }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+        const accessToken = jwt.sign({ nickname }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+        mqttClient.publish('login', "", () => {
+            console.log(`Wysłano komunikat o zalogowaniu`)
+        })
         res.cookie('accessToken', accessToken, { httpOnly: true })
         res.redirect('/')
     } catch (err) {

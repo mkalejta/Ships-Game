@@ -167,6 +167,7 @@
         CreateButton.addEventListener('click', async (e) => {
             e.preventDefault()
             const redirect = await actions.createGame({ player: Player })
+            console.log(redirect)
             if(redirect) {
                 window.location.href = redirect
             }

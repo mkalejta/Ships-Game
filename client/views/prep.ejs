@@ -272,7 +272,7 @@
 
         ClearButton.addEventListener('click', () => {
             Cells.forEach(cell => cell.classList=[]);
-            actions.prepClear(Player, Id)
+            actions.prepClear({ player: Player }, Id)
             parts = [];
             currentShipSizes = [...startShipSizes];
             shipListRefresh();
@@ -314,20 +314,6 @@
         socket.on('add alert', alert => {
             newAlert(alert)
         })
-
-        // async function ifGameStart() {
-        //     const GameState = await actions.gameState(Id).then(data => data)
-        //     return Object.values({...GameState}.players).map(player => player.ready).every(val => val === true)
-        // }
-
-        // socket.on('start game', async () => {
-        //     const ifStart = await ifGameStart();
-        //     if (ifStart) {
-        //         setTimeout(() => {
-        //             document.location.href = `/game/${Id}`;
-        //         }, 3000);
-        //     }
-        // })
 
         roomJoining();
     </script>

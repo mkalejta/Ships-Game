@@ -3,6 +3,7 @@ let actions = {
         const inputs = utils.promptUser(["Game name: "])
         if (inputs.every(e => e)) {
             return API.createGame(player, ...inputs).then((res) => {
+                console.log(res)
                 return res
             }).catch(alert)
         } else {

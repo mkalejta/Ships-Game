@@ -20,12 +20,12 @@ require("dotenv").config();
 process.on('SIGUSR1', resetServerStartTime);
 process.on('SIGUSR2', resetServerStartTime);
 
-const expressServer = app.listen(PORT, () => {
-    console.log(`Backend listens on port ${PORT}`);
+const expressServer = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running at http://0.0.0.0:${PORT}`);
 });
 const io = new Server(expressServer, {
     cors: {
-        origin: ["https://admin.socket.io"],
+        origin: ["https://admin.socket.io", "*"],
         credentials: true,
     },
 });
@@ -50,9 +50,12 @@ app.use("/api", routing);
 app.use("*/game", middleware);
 
 const endGameTopic = "endGame";
+const loginTopic = "login";
+const logoutTopic = "logout";
+let logged = false;
 
-mqttClient.subscribe(endGameTopic, () => {
-    console.log(`Zasubksrybowano endGame`)
+mqttClient.subscribe([loginTopic, logoutTopic, endGameTopic], () => {
+    console.log(`Zasubksrybowano login, logout i endGame`)
 })
 
 mqttClient.on("message", (topic, message) => {
@@ -61,47 +64,59 @@ mqttClient.on("message", (topic, message) => {
     if (topic === endGameTopic) {
         mqttClient.publish("ranking", winner)
         mqttClient.publish("winner", winner)
+    } else if (topic === loginTopic) {
+        logged = true
+    } else if (topic === logoutTopic) {
+        logged = false
     }
 })
 
 
 // Generowanie widoków
 app.get('/', (req, res) => {
-    res.render("home.ejs");
+    const logStatus = logged;
+    res.render("home.ejs", { logStatus });
 });
 
 app.get('/game', async (req, res) => {
+    const logStatus = logged;
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
     const games = await db.getData('/games');
-    res.render("games.ejs", { player: player, games: games });
+    res.render("games.ejs", { player: player, games: games, logStatus });
 })
 
 app.get('/game/:id', (req, res) => {
+    const logStatus = logged;
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
-    res.render("game.ejs", { player });
+    res.render("game.ejs", { player, logStatus });
 })
 
 app.get('/game/:id/prep', (req, res) => {
+    const logStatus = logged;
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
-    res.render("prep.ejs", { player });
+    res.render("prep.ejs", { player, logStatus });
 })
 
 app.get('/registration', (req, res) => {
-    res.render("registration.ejs")
+    const logStatus = logged;
+    res.render("registration.ejs", { logStatus })
 })
 
 app.get('/login', (req, res) => {
-    res.render("login.ejs")
+    const logStatus = logged;
+    res.render("login.ejs", { logStatus })
 })
 
 app.get('/ranking', async (req, res) => {
+    const logStatus = logged;
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
     const ranking = await db.getData('/ranking')
-    res.render("ranking.ejs", { ranking, player })
+    res.render("ranking.ejs", { ranking, player, logStatus })
 })
 
 app.get('/instructions', (req, res) => {
-    res.render("instructions.ejs")
+    const logStatus = logged;
+    res.render("instructions.ejs", { logStatus })
 })
 
 const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych

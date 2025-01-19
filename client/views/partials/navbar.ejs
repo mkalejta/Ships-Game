@@ -56,8 +56,37 @@
             </ul>
         </div>
         <div>
-            <a href="/registration"><button class="btn btn-secondary" type="button" style="font-weight: bold;">Register</button></a>
-            <a href="/login"><button class="btn btn-success" type="button" style="font-weight: bold;">Login</button></a>
+            <a href="/registration"><button id="registration-button" class="btn btn-secondary" type="button" style="font-weight: bold;">Register</button></a>
+            <a href="/login"><button id="login-button" class="btn btn-success" type="button" style="font-weight: bold;">Login</button></a>
+            <button id="logout-button" class="btn btn-danger" type="button" style="font-weight: bold;">Logout</button>
         </div>
     </div>
 </nav>
+<script>
+    let RegistrationButton = document.getElementById("registration-button");
+    let LoginButton = document.getElementById("login-button");
+    let LogoutButton = document.getElementById("logout-button");
+    const logStatus = JSON.parse("<%- logStatus %>");
+    if(logStatus) {
+        LoginButton.style.display = 'none';
+        RegistrationButton.style.display = 'none';
+        LogoutButton.style.display = 'inline-block';
+    } else {
+        LoginButton.style.display = 'inline-block';
+        RegistrationButton.style.display = 'inline-block';
+        LogoutButton.style.display = 'none';
+    }
+
+    LogoutButton.addEventListener('click', async (e) => {
+        e.preventDefault()
+        try {
+            const response = await fetch(`/api/logout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+        } catch (error) {
+            alert('An unexpected error occurred.');
+        }
+    })
+</script>

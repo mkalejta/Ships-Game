@@ -1,5 +1,5 @@
 let API = {
-    api: axios.create({ baseURL: "http://localhost:3000/api" }),
+    api: axios.create({ baseURL: "https://192.168.0.130/api" }),
     getGame: function(id) {
         return this.api.get(`/game/${id}`)
             .then(response => response.data)
@@ -11,8 +11,9 @@ let API = {
     createGame: function(player, gameName) {
         return this.api.post(`/game`, {...player, gameName})
         .then(response => {
-            return response.request.responseURL
-        })
+            console.log(response)
+            return response.data.redirectURL;
+        });
     },
     joinGame: function(player, id) {
         return this.api.put(`/game/${id}/join`, player)

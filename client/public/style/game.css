@@ -142,6 +142,11 @@ body {
     pointer-events: none;
 }
 
+.board div.sink {
+    background-color: black;
+    pointer-events: none;
+}
+
 .board div.all-placed {
     pointer-events: none;
 }
