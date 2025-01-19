@@ -71,8 +71,8 @@
                     body: JSON.stringify({ nickname, password })
                 });
 
-                if (response) {
-                    window.location.href = '/';
+                if (response.redirected) {
+                    window.location.href = response.url;
                 } else {
                     const errorData = await response.json();
                     alert(errorData.error || 'An error occurred.');
