@@ -1,6 +1,7 @@
 const db = require("../db.js")
 const Game = require("../objects/Game.js")
 const Player = require("../objects/Player.js")
+const mqttClient = require("../mqttConfig.js");
 
 module.exports = (req, res) => {
     const creator = req.body.player
@@ -17,6 +18,9 @@ module.exports = (req, res) => {
 
     try {
         db.push("/games[]", game, true)
+        mqttClient.publish('games/updates', JSON.stringify(game), () => {
+            console.log('Opublikowano nową grę:', game);
+        });
         console.log(`${creator} has created a game.`)
         res.redirect(`/game/${game.id}/prep`)
     } catch (error) {

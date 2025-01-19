@@ -1,12 +1,11 @@
 db = require("../../db")
 const Ship = require("../../objects/Ship")
 const Board = require("../../objects/Board")
-const jwt = require('jsonwebtoken')
+const mqttClient = require('../../mqttConfig.js')
 
 module.exports = async (req, res) => {
     const gameId = req.params.id
     const player = req.body.player
-    console.log(req.body)
 
     if (!gameId || !player) {
         res.status(400).json({ error: "Id and player have to be given!" })
@@ -66,6 +65,11 @@ module.exports = async (req, res) => {
                 if (data[i].id === req.params.id) {
                     data[i].players[player].ready = true
                     console.log(`${player} is ready`)
+                    if (data[i].players[opponent].ready === true) {
+                        mqttClient.publish('game/start', "", () => {
+                            console.log(`Gra ${data[i].name} startuje`)
+                        })
+                    }
                     res.status(200).json(data[i])
                 }
             }

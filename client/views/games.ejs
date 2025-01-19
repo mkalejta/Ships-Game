@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <style>
         .card {
             width: 100%;
@@ -107,21 +108,53 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js"></script>
     <script>
-        actions.refreshGames("")
-        const CreateButton = document.getElementById('create-button')
+        client.on('connect', () => {
+            console.log('Połączono z brokerem MQTT (klient)');
+
+            client.subscribe('games/updates', (err) => {
+                if (!err) {
+                    console.log('Subskrybowano temat: games/updates');
+                } else {
+                    console.error('Błąd subskrypcji:', err);
+                }
+            });
+        });
+
+        client.on('message', (topic, message) => {
+            if (topic === 'games/updates') {
+                const gameInfo = JSON.parse(message.toString());
+                console.log('Otrzymano nową grę:', gameInfo);
+                const num = Number(Notifications.innerText);
+                if (num) {
+                    Notifications.innerText = String(num + 1);
+                } else {
+                    Notifications.innerText = '1';
+                }
+            }
+        });
+
+        client.on('error', (error) => {
+            console.error('Błąd MQTT:', error);
+        });
+
         const Player = "<%- player %>";
-        const newGame = "<%- newGame %>";
-        
-        let SearchInput = document.getElementById('search')
-        let SearchButton = document.getElementById('search-button')
+        let Games = JSON.parse('<%- JSON.stringify(games) %>');
+
+        const CreateButton = document.getElementById('create-button');
+        const SearchButton = document.getElementById('search-button');
+        let Notifications = document.getElementById('notifications');
+        let SearchInput = document.getElementById('search');
         let Names = [];
+        
+        Notifications.innerText = "";
+        actions.refreshGames(Games, "");
 
         function searchRegex(e) {
             e.preventDefault()
-            actions.refreshGames(SearchInput.value)
+            actions.refreshGames(Games, SearchInput.value)
         }
         
-        SearchButton.addEventListener('onclick', e => {
+        SearchButton.addEventListener('click', e => {
             searchRegex(e)
         })
 
@@ -134,11 +167,18 @@
         CreateButton.addEventListener('click', async (e) => {
             e.preventDefault()
             const redirect = await actions.createGame({ player: Player })
-            window.location.href = redirect
+            if(redirect) {
+                window.location.href = redirect
+            }
         })
+
+        if(performance.navigation.type == 2){
+            location.reload(true);
+        }
 
         document.addEventListener("DOMContentLoaded", async (e) => {
             e.preventDefault()
+            await actions.refreshGames(Games, "")
             let JoinButtons = document.querySelectorAll('#cards [name=join-button]')
             for (let button of JoinButtons) {
                 button.addEventListener('click', async (e) => {
@@ -153,7 +193,6 @@
                         });
 
                         if (response.redirected) {
-                            await actions.refreshGames("");
                             window.location.href = response.url;
                         } else {
                             const errorData = await response.json();
@@ -166,6 +205,17 @@
                 })
             }
         })
+
+        const fetchGames = async () => {
+            try {
+                const data = await API.getAllGames();
+                Games = { ...data};
+            } catch (error) {
+                console.error("Błąd pobierania danych:", error);
+            }
+        };
+
+        setInterval(fetchGames, 3000);
     </script>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"
     integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"

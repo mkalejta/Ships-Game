@@ -3,23 +3,20 @@ let actions = {
         const inputs = utils.promptUser(["Game name: "])
         if (inputs.every(e => e)) {
             return API.createGame(player, ...inputs).then((res) => {
-                this.refreshGames()
                 return res
             }).catch(alert)
         } else {
             alert("Please enter all the fields correctly!")
         }
     },
-    refreshGames: function(search) {
-        API.getAllGames().then(response => {
-            document.querySelector("#cards").innerHTML = "" // reset games
-            const regex = RegExp(search, "i")
-            response.forEach(game => {
-                if (regex.test(game.name)) {
-                    document.querySelector("#cards").innerHTML += utils.card(game)
-                }
-            });
-        }).catch(alert)
+    refreshGames: function(games, search) {
+        document.querySelector("#cards").innerHTML = "" // reset games
+        const regex = RegExp(search, "i")
+        games.forEach(game => {
+            if (regex.test(game.name)) {
+                document.querySelector("#cards").innerHTML += utils.card(game)
+            }
+        });
     },
     makePrepChoice: function(player, id, parts) {
         API.makePrepChoice(player, id, parts).then((res) => {

@@ -26,8 +26,7 @@ module.exports = async (req, res) => {
 
         const accessToken = jwt.sign({ nickname }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
         res.cookie('accessToken', accessToken, { httpOnly: true })
-        res.status(200).json({ message: "Successfully logged in" })
-        
+        res.redirect('/')
     } catch (err) {
         return res.status(500).json(err.message);
     }

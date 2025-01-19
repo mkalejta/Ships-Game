@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 const routing = require("./routing");
@@ -11,6 +12,7 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const mqttClient = require('./mqttConfig');
 const ranking = require('./ranking');
+const db = require('./db.js')
 require("dotenv").config();
 
 
@@ -31,6 +33,8 @@ instrument(io, {
     auth: false
 });
 
+app.use(cors()); 
+
 
 // Ustawienia widoków
 app.set("view engine", "ejs");
@@ -45,11 +49,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api", routing);
 app.use("*/game", middleware);
 
-
 const endGameTopic = "endGame";
 
 mqttClient.subscribe(endGameTopic, () => {
-    console.log(`Zasubksrybowano nowy topic endGame`)
+    console.log(`Zasubksrybowano endGame`)
 })
 
 mqttClient.on("message", (topic, message) => {
@@ -57,6 +60,7 @@ mqttClient.on("message", (topic, message) => {
 
     if (topic === endGameTopic) {
         mqttClient.publish("ranking", winner)
+        mqttClient.publish("winner", winner)
     }
 })
 
@@ -66,13 +70,10 @@ app.get('/', (req, res) => {
     res.render("home.ejs");
 });
 
-app.get('/game', (req, res) => {
+app.get('/game', async (req, res) => {
     const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
-    res.render("games.ejs", { player, newGame });
-})
-
-app.get('/game/create', (req, res) => {
-    res.render("createGame.ejs");
+    const games = await db.getData('/games');
+    res.render("games.ejs", { player: player, games: games });
 })
 
 app.get('/game/:id', (req, res) => {
@@ -91,6 +92,16 @@ app.get('/registration', (req, res) => {
 
 app.get('/login', (req, res) => {
     res.render("login.ejs")
+})
+
+app.get('/ranking', async (req, res) => {
+    const player = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET).nickname;
+    const ranking = await db.getData('/ranking')
+    res.render("ranking.ejs", { ranking, player })
+})
+
+app.get('/instructions', (req, res) => {
+    res.render("instructions.ejs")
 })
 
 const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
@@ -147,10 +158,6 @@ io.on('connection', socket => {
         io.to(gameId).except(socket.id).emit('your turn')
     })
 
-    socket.on('winner', ({ gameId, winner }) => {
-        io.to(gameId).emit('win', winner)
-    })
-
     socket.on('join game', ({ player, gameId }, cb) => {
         if(!alerts[gameId]) {
             alerts[gameId] = []
@@ -178,7 +185,7 @@ io.on('connection', socket => {
             io.to(gameId).emit('add alert', alert)
         }
 
-        io.to(gameId).emit('start game')
+        // io.to(gameId).emit('start game')
 
         cb(alerts[gameId])
     })

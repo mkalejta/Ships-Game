@@ -1,6 +1,7 @@
 db = require("../../db")
 const Board = require("../../objects/Board.js")
 const Ship = require("../../objects/Ship.js")
+const mqttClient = require('../../mqttConfig.js')
 
 module.exports = async (req, res) => {
     const move = req.body.move
@@ -26,6 +27,7 @@ module.exports = async (req, res) => {
     boardObj.make_move(move); // Wykonanie ruchu
 
     if (boardObj.ifAllSink()) {
+        mqttClient.publish('endGame', player)
         game.winner = player
         game.time = new Date().toLocaleString()
     }
