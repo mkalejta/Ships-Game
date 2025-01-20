@@ -270,9 +270,10 @@
             }
         })
 
-        ClearButton.addEventListener('click', () => {
+        ClearButton.addEventListener('click', (e) => {
+            e.preventDefault()
             Cells.forEach(cell => cell.classList=[]);
-            actions.prepClear({ player: Player }, Id)
+            actions.prepClear(Player, Id)
             parts = [];
             currentShipSizes = [...startShipSizes];
             shipListRefresh();

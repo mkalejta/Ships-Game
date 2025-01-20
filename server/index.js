@@ -30,7 +30,12 @@ instrument(io, {
     auth: false
 });
 
-app.use(cors()); 
+const corsOptions = {
+    origin: '*',
+    methods: ['GET', 'POST', 'DELETE', 'PUT', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use(cors(corsOptions));
 
 
 // Ustawienia widoków
@@ -45,20 +50,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/api", routing);
 app.use(middleware);
-// app.use("*/game*", (req, res, next) => {
-//     const token = req.cookies.accessToken;
-//     console.log(req._parsedUrl.path.includes('game'))
-
-//     if (!token) {
-//         return res.redirect('/login')
-//     }
-
-//     try {
-//         next();
-//     } catch (err) {
-//         next();
-//     }
-// });
 
 
 const endGameTopic = "endGame";

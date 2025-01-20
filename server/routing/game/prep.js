@@ -6,6 +6,7 @@ const mqttClient = require('../../mqttConfig.js')
 module.exports = async (req, res) => {
     const gameId = req.params.id
     const player = req.body.player
+    console.log(req.body)
 
     if (!gameId || !player) {
         res.status(400).json({ error: "Id and player have to be given!" })

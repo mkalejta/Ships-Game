@@ -24,7 +24,7 @@ let API = {
         .then(response => response.data)
     },
     clearPrepChoices: function(player, id) {
-        return this.api.delete(`/game/${id}/prep`, player)
+        return this.api.delete(`/game/${id}/prep`, { data: player })
         .then(response => response.data)
     },
     confirmPrepChoices: function(player, id) {
