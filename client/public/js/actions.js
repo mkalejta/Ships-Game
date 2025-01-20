@@ -20,17 +20,14 @@ let actions = {
     },
     makePrepChoice: function(player, id, parts) {
         API.makePrepChoice(player, id, parts).then((res) => {
-            console.log(res);
         }).catch(alert)
     },
     prepClear: function(player, id) {
         API.clearPrepChoices(player, id).then((res) => {
-            console.log(res);
         }).catch(alert);
     },
     prepConfirm: function(player, id) {
         API.confirmPrepChoices(player ,id).then((res) => {
-            console.log(res);
         }).catch(alert)
     },
     gameState: function(id) {

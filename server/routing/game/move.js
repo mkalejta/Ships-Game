@@ -25,9 +25,10 @@ module.exports = async (req, res) => {
     boardObj.ships = boardObj.ships.map(ship => new Ship(ship.parts, ship.sink)); // Zamiana danych na obiekty Ship
 
     boardObj.make_move(move); // Wykonanie ruchu
+    const selfSinkedShips = game.players[player].boards["self"].ships.filter((ship) => ship.sink).length
 
     if (boardObj.ifAllSink()) {
-        mqttClient.publish('endGame', player)
+        mqttClient.publish('endGame', player + "/" + selfSinkedShips)
         game.winner = player
         game.time = new Date().toLocaleString()
     }

@@ -7,24 +7,20 @@ mqttClient.subscribe(Topic, () => {
 })
 
 mqttClient.on("message", async (topic, message) => {
-    let data = await db.getData("/ranking")
-    const winner = message.toString()
+    let data = await db.getData("/users");
+    const [ winner, selfSinkedShips ] = message.toString().split('/');
 
     if (topic === Topic) {
-            
-        if(!data.map(obj => Object.keys(obj)[0]).includes(winner)) {
-            data.push({[winner]: 0})
-        }
     
         for (let i = 0; i < data.length; i++) {
-            if(Object.keys(data[i])[0] === winner) {
-                data[i][winner] += 100
+            if(data[i].nickname === winner) {
+                data[i].ranking += 100 - (Number(selfSinkedShips) * 10)
                 break
             }
         }
     
         try {
-            await db.push("/ranking", data)
+            await db.push("/users", data)
             console.log('Ranking is up to date')
         } catch (err) {
             console.log(err)
