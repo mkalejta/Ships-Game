@@ -58,10 +58,10 @@ mqttClient.subscribe(endGameTopic, () => {
 })
 
 mqttClient.on("message", (topic, message) => {
-    const winner = message.toString();
+    const [ winner, selfSinkedShips ] = message.toString().split('/');
 
     if (topic === endGameTopic) {
-        mqttClient.publish("ranking", winner)
+        mqttClient.publish("ranking", message)
         mqttClient.publish("winner", winner)
     }
 })
@@ -97,7 +97,19 @@ app.get('/login', (req, res) => {
 })
 
 app.get('/ranking', async (req, res) => {
-    const ranking = await db.getData('/ranking')
+    const data = await db.getData('/users');
+    const sortRanking = (array) => array.sort((a, b) => {
+        const [nameA, rankingA] = Object.entries(a)[0];
+        const [nameB, rankingB] = Object.entries(b)[0];
+
+        if (rankingA !== rankingB) {
+            return rankingB - rankingA;
+        }
+
+        return nameA.localeCompare(nameB);
+    });
+
+    const ranking = sortRanking(data.map((user) => ({[user.nickname]: user.ranking})));
     res.render("ranking.ejs", { ranking })
 })
 

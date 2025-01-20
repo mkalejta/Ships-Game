@@ -124,10 +124,11 @@
             OpponentName.innerHTML = `${getOpponent(GameState, Player)}'s Board`;
             OpponentBoard = GameState.players[Player].boards["opponent"].board;
             YourBoard = GameState.players[Player].boards["self"].board;
-            OpponentShips = GameState.players[Player].boards["opponent"].ships;
+            OpponentShips = GameState.players[getOpponent(GameState, Player)].boards["self"].ships;
             YourShips = GameState.players[Player].boards["self"].ships;
 
             let hitParts = [];
+            let sinkOpponentShips = [];
 
             for (let ship of YourShips) {
                 for (let part of ship.parts) {
@@ -137,12 +138,24 @@
                 }
             }
 
+            for (let ship of OpponentShips) {
+                if (ship.sink) {
+                    sinkOpponentShips.push(...ship.parts.map(part => part.position));
+                }
+            }
+
             OpponentBoard.forEach((row, i) => {
                 row.forEach((field, j) => {
                     const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
                     if (field === '0') {
                         cell.classList.add('miss');
                     } else if (field !== '1') {
+                        for (let part of sinkOpponentShips) {
+                            if (part[0] === String(i) && part[1] === String(j)) {
+                                cell.classList.add('sink');
+                                break;
+                            }
+                        }
                         cell.classList.add('ship');
                     }
                 })
@@ -249,6 +262,18 @@
                 previousMoves.forEach((move) => {
                     newMessage(move)
                 });
+                const players = Object.keys(GameState.players)
+                if (Player === players[1] && previousMoves.length === 0) {
+                    OpponentBoard.forEach((row, i) => {
+                        row.forEach((field, j) => {
+                            const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
+                            if (field === '1') {
+                                cell.classList.add('disabled');
+                            }
+                        })
+                    })
+                    socket.emit('miss', { gameId: Id })
+                }
                 shipListRefresh()
             });
         }
