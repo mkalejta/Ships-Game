@@ -11,7 +11,6 @@ let API = {
     createGame: function(player, gameName) {
         return this.api.post(`/game`, {...player, gameName})
         .then(response => {
-            console.log(response)
             return response.data.redirectURL;
         });
     },
