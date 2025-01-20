@@ -270,10 +270,21 @@
             }
         })
 
-        ClearButton.addEventListener('click', (e) => {
+        ClearButton.addEventListener('click', async (e) => {
             e.preventDefault()
             Cells.forEach(cell => cell.classList=[]);
-            actions.prepClear(Player, Id)
+            // actions.prepClear(Player, Id)
+            try {
+                const response = await fetch(`/api/game/${Id}/prep`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        player: Player
+                    })
+                });
+            } catch (error) {
+                alert('An unexpected error occurred.');
+            }
             parts = [];
             currentShipSizes = [...startShipSizes];
             shipListRefresh();
