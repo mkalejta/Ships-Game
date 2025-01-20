@@ -9,12 +9,12 @@ let actions = {
             alert("Please enter all the fields correctly!")
         }
     },
-    refreshGames: function(games, search) {
+    refreshGames: function(player, games, search) {
         document.querySelector("#cards").innerHTML = "" // reset games
         const regex = RegExp(search, "i")
         games.forEach(game => {
             if (regex.test(game.name)) {
-                document.querySelector("#cards").innerHTML += utils.card(game)
+                document.querySelector("#cards").innerHTML += utils.card(player, game)
             }
         });
     },

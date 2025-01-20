@@ -147,11 +147,11 @@
         let Names = [];
         
         Notifications.innerText = "";
-        actions.refreshGames(Games, "");
+        actions.refreshGames(Player, Games, "");
 
         function searchRegex(e) {
             e.preventDefault()
-            actions.refreshGames(Games, SearchInput.value)
+            actions.refreshGames(Player, Games, SearchInput.value)
         }
         
         SearchButton.addEventListener('click', e => {
@@ -178,8 +178,9 @@
 
         document.addEventListener("DOMContentLoaded", async (e) => {
             e.preventDefault()
-            await actions.refreshGames(Games, "")
+            // await actions.refreshGames(Player, Games, "")
             let JoinButtons = document.querySelectorAll('#cards [name=join-button]')
+            let BackToTheGameButtons = document.querySelectorAll('#cards [name=back-to-the-game-button]')
             for (let button of JoinButtons) {
                 button.addEventListener('click', async (e) => {
                     e.preventDefault()
@@ -201,6 +202,18 @@
                     } catch (error) {
                         console.error('Error during joining game:', error);
                         alert('An unexpected error occurred.');
+                    }
+                })
+            }
+
+            for (let button of BackToTheGameButtons) {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault()
+                    const gameState = await actions.gameState(button.id).then(data => data);
+                    if (Object.values(gameState.players).filter((player) => player.ready).length === 2) {
+                        window.location.href = `/game/${button.id}`;
+                    } else {
+                        window.location.href = `game/${button.id}/prep`;
                     }
                 })
             }

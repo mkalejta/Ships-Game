@@ -53,7 +53,9 @@ module.exports = async (req, res) => {
             for (let i = 0; i < data.length; i++) {
                 if (data[i].id === req.params.id) {
                     data[i].players[player].boards["self"].ships = []
+                    data[i].players[player].boards["self"].board = build_board()
                     data[i].players[opponent].boards['opponent'].ships = []
+                    data[i].players[opponent].boards["opponent"].board = build_board()
                     console.log(`${player}'s choices are cleared!`)
                     res.status(200).json(data[i])
                 }
@@ -82,4 +84,14 @@ module.exports = async (req, res) => {
 function getOpponent(game, player) {
     let opponent = Object.keys(game.players).filter(name => name !== player)[0]
     return opponent;
+}
+
+SIZE = 10;
+
+function build_board() {
+    let board = []
+    for (let i = 0; i < SIZE; i++) {
+        board.push(Array(SIZE).fill('1'))
+    }
+    return board;
 }

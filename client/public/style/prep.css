@@ -170,6 +170,10 @@ h1 {
     background-color: red;
 }
 
+.board div.waiting {
+    pointer-events: none;
+}
+
 .board div.ship {
     background-color: grey;
     pointer-events: none;
