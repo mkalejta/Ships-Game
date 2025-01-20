@@ -261,6 +261,7 @@
             GameState = await actions.gameState(Id).then(data => data);
             YourBoard = GameState.players[Player].boards["self"].board;
             currentShipSizes = arrayDifference(currentShipSizes, GameState.players[Player].boards["self"].ships.map((ship) => ship.size));
+            playersStates = Object.values(GameState.players).filter((player) => player.ready);
 
             YourBoard.forEach((row, i) => {
                 row.forEach((field, j) => {
@@ -274,6 +275,16 @@
             })
             disableCellsAroundShip();
             shipListRefresh();
+            console.log(playersStates.length === 2)
+
+            if (playersStates.length === 2) {
+                AddButton.classList.add('disabled')
+                ClearButton.classList.add('disabled')
+                ConfirmButton.classList.add('disabled')
+                for (let cell of Cells) {
+                    cell.classList.add('all-placed')
+                }
+            } 
         }
 
         Cells.forEach(field => field.addEventListener('click', () => {
@@ -304,6 +315,13 @@
             }
         })
 
+        document.addEventListener('keypress', function (e) {
+            if(e.key === 'Enter') {
+                e.preventDefault();
+                AddButton.click();
+            }
+        })
+
         ClearButton.addEventListener('click', async (e) => {
             e.preventDefault()
             for (let cell of Cells) {
@@ -325,16 +343,17 @@
             toggleClearButton();
             toggleConfirmButton();
             shipListRefresh();
+            await refreshGameState();
         });
 
-        ConfirmButton.addEventListener('click', () => {
+        ConfirmButton.addEventListener('click', async () => {
             Cells.forEach(cell => {
                 if (!cell.classList.contains('ship')) {
                     cell.classList.add('confirmed');
                 }
             });
             Info.hidden = true;
-            actions.prepConfirm({player: Player}, Id);
+            await actions.prepConfirm({player: Player}, Id);
             socket.emit('ready', { player: Player, gameId: Id }, (previousAlerts) => {
                 PrepAlerts.innerHTML = ''
                 previousAlerts.forEach((alert) => {
@@ -350,7 +369,7 @@
         }
 
         async function roomJoining() {
-            socket.emit('join game', { player: Player, gameId: Id }, async (previousAlerts) => {
+            socket.emit('join game', { player: Player, gameId: Id }, (previousAlerts) => {
                 PrepAlerts.innerHTML = ''
                 previousAlerts.forEach((alert) => {
                     newAlert(alert)
@@ -364,7 +383,7 @@
                         cell.classList.remove('waiting')
                     })
                 }
-                await refreshGameState()
+                refreshGameState()
             });
         }
 

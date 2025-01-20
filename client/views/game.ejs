@@ -183,7 +183,7 @@
 
         function shipListRefresh() {
             ShipList.innerHTML = "";
-            for (let ship of new Set(ShipsOpponentSinked)) {
+            for (let ship of [...(new Set(ShipsOpponentSinked))].sort()) {
                 let li = document.createElement("li")
                 let span = document.createElement("span")
                 span.innerHTML = `${ShipsOpponentSinked.filter(s => s === ship).length} x `
@@ -224,6 +224,7 @@
                             }
                         })
                     })
+                    highlightEnemyBoard();
                     socket.emit('miss', { gameId: Id })
                 }
             });
@@ -255,6 +256,24 @@
             }
         }
 
+        function highlightYourBoard() {
+            for (let cell of Cells) {
+                cell.classList.add('your-turn')
+            }
+            for (let cell2 of Cells2) {
+                cell2.classList.remove('enemy-turn')
+            }
+        }
+
+        function highlightEnemyBoard() {
+            for (let cell of Cells) {
+                cell.classList.remove('your-turn')
+            }
+            for (let cell2 of Cells2) {
+                cell2.classList.add('enemy-turn')
+            }
+        }
+
         async function startGame() {
             socket.emit('start game', { player: Player, gameId: Id }, (previousMoves, shipsSinked) => {
                 ShipsOpponentSinked = shipsSinked
@@ -263,7 +282,7 @@
                     newMessage(move)
                 });
                 const players = Object.keys(GameState.players)
-                if (Player === players[1] && previousMoves.length === 0) {
+                if ((Player === players[1] && previousMoves.length === 0) || previousMoves.slice(-1)[0]?.includes(Player)) {
                     OpponentBoard.forEach((row, i) => {
                         row.forEach((field, j) => {
                             const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
@@ -272,18 +291,22 @@
                             }
                         })
                     })
+                    highlightEnemyBoard();
                     socket.emit('miss', { gameId: Id })
+                } else {
+                    highlightYourBoard();
                 }
-                shipListRefresh()
+                shipListRefresh();
             });
         }
 
-        socket.on('message', message => {
+        socket.on('message', async (message) => {
             newMessage(message);
-            refreshGameState();
+            await refreshGameState();
         })
 
         socket.on('your turn', () => {
+            highlightYourBoard()
             OpponentBoard.forEach((row, i) => {
                 row.forEach((field, j) => {
                     const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
