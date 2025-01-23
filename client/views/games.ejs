@@ -222,7 +222,7 @@
         const fetchGames = async () => {
             try {
                 const data = await API.getAllGames();
-                Games = { ...data};
+                Games = [...data];
             } catch (error) {
                 console.error("Błąd pobierania danych:", error);
             }

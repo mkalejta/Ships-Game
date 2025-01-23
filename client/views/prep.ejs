@@ -275,7 +275,6 @@
             })
             disableCellsAroundShip();
             shipListRefresh();
-            console.log(playersStates.length === 2)
 
             if (playersStates.length === 2) {
                 AddButton.classList.add('disabled')
@@ -369,12 +368,13 @@
         }
 
         async function roomJoining() {
+            GameState = await actions.gameState(Id).then(data => data)
             socket.emit('join game', { player: Player, gameId: Id }, (previousAlerts) => {
                 PrepAlerts.innerHTML = ''
                 previousAlerts.forEach((alert) => {
                     newAlert(alert)
                 });
-                if (previousAlerts.length === 1) {
+                if (previousAlerts.length === 1 && Object.keys(GameState.players).length !== 2) {
                     Cells.forEach(cell => {
                         cell.classList.add('waiting')
                     })

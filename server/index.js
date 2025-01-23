@@ -124,27 +124,18 @@ app.get('*', function(req, res){
 const alerts = {}; // Sygnały w fazie przygotowań są tymczasowe dlatego nie ma potrzeby zapisywac ich w bazie danych
 const moves = {}; // -- || --
 const Letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-const ships = {};
 
 io.on('connection', socket => {
     console.log('a user connected')
 
-    socket.on('start game', ({ player, gameId }, cb) => {
+    socket.on('start game', ({ gameId }, cb) => {
         if(!moves[gameId]) {
             moves[gameId] = []
         }
 
-        if(!ships[gameId]) {
-            ships[gameId] = {}
-        }
-
-        if(!ships[gameId][player]) {
-            ships[gameId][player] = []
-        }
-
         socket.join(gameId)
 
-        cb(moves[gameId], ships[gameId][player])
+        cb(moves[gameId])
     })
 
     socket.on('move', ({ player, move, gameId }, cb) => {
@@ -164,10 +155,9 @@ io.on('connection', socket => {
         io.to(gameId).emit('message', message)
     })
 
-    socket.on('sink', ({ gameId, player, shipsSinked }) => {
+    socket.on('sink', ({ gameId }) => {
         const message = "Hit & Sink!"
         moves[gameId].push(message)
-        ships[gameId][player] = shipsSinked
         io.to(gameId).emit('message', message)
     })
 
@@ -201,8 +191,6 @@ io.on('connection', socket => {
             alerts[gameId].push(alert)
             io.to(gameId).emit('add alert', alert)
         }
-
-        // io.to(gameId).emit('start game')
 
         cb(alerts[gameId])
     })

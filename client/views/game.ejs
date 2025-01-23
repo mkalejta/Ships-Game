@@ -69,7 +69,7 @@
         let Cells2 = document.querySelectorAll('[name=your-board] div');
         let Messages = document.getElementById('messages');
         let OpponentName = document.getElementById('opponent-name');
-        let ShipsOpponentSinked = [];
+        let ShipsOpponentSinked;
         let move = [];
         let hitShip;
 
@@ -119,6 +119,19 @@
             return opponent;
         }
 
+        function arrayDifference(arr1, arr2) {
+            const result = [...arr1];
+
+            for (const item of arr2) {
+                const index = result.indexOf(item);
+                if (index !== -1) {
+                    result.splice(index, 1);
+                }
+            }
+
+            return result;
+        }
+
         async function refreshGameState() {
             GameState = await actions.gameState(Id).then(data => data);
             OpponentName.innerHTML = `${getOpponent(GameState, Player)}'s Board`;
@@ -126,6 +139,9 @@
             YourBoard = GameState.players[Player].boards["self"].board;
             OpponentShips = GameState.players[getOpponent(GameState, Player)].boards["self"].ships;
             YourShips = GameState.players[Player].boards["self"].ships;
+            ShipsOpponentSinked = 
+                await GameState.players[getOpponent(GameState, Player)].boards["self"].ships
+                    .filter((ship) => ship.sink).map((ship) => ship.size).sort()
 
             let hitParts = [];
             let sinkOpponentShips = [];
@@ -183,10 +199,10 @@
 
         function shipListRefresh() {
             ShipList.innerHTML = "";
-            for (let ship of [...(new Set(ShipsOpponentSinked))].sort()) {
+            for (let ship of [...(new Set(ShipsOpponentSinked))]) {
                 let li = document.createElement("li")
                 let span = document.createElement("span")
-                span.innerHTML = `${ShipsOpponentSinked.filter(s => s === ship).length} x `
+                span.innerHTML = `${ShipsOpponentSinked.filter((s) => s === ship).length} x `
                 let img = document.createElement("img")
                 img.height = 24
                 img.widht = 24
@@ -200,19 +216,13 @@
             }
         }
 
-        shipListRefresh();
-        refreshGameState();
-
         Cells.forEach(field => field.addEventListener('click', async () => {
             const [ row, col ] = [field.attributes['data-row'].value, field.attributes['data-col'].value];
             move = [ row, col ];
             await actions.makeMove(Player, Id, { move });
-            await refreshGameState();
             socket.emit('move', { player: Player, move, gameId: Id }, () => {
                 if (ifHit(move) && ifSink()) {
-                    ShipsOpponentSinked.push(hitShip.size)
-                    socket.emit('sink', { gameId: Id, player: Player, shipsSinked: ShipsOpponentSinked })
-                    shipListRefresh();
+                    socket.emit('sink', { gameId: Id })
                 } else if (ifHit(move)) {
                     socket.emit('hit', { gameId: Id })
                 } else {
@@ -228,6 +238,8 @@
                     socket.emit('miss', { gameId: Id })
                 }
             });
+            await refreshGameState();
+            shipListRefresh();
         }))
 
         function ifHit(move) {
@@ -275,14 +287,14 @@
         }
 
         async function startGame() {
-            socket.emit('start game', { player: Player, gameId: Id }, (previousMoves, shipsSinked) => {
-                ShipsOpponentSinked = shipsSinked
+            await refreshGameState();
+            socket.emit('start game', { gameId: Id }, (previousMoves) => {
                 Messages.innerHTML = ''
                 previousMoves.forEach((move) => {
                     newMessage(move)
                 });
                 const players = Object.keys(GameState.players)
-                if ((Player === players[1] && previousMoves.length === 0) || previousMoves.slice(-1)[0]?.includes(Player)) {
+                if ((Player === players[1] && previousMoves.length === 0) || !previousMoves.slice(-2)?.some((move) => move.includes(Player))) {
                     OpponentBoard.forEach((row, i) => {
                         row.forEach((field, j) => {
                             const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
@@ -296,8 +308,8 @@
                 } else {
                     highlightYourBoard();
                 }
-                shipListRefresh();
             });
+            shipListRefresh();
         }
 
         socket.on('message', async (message) => {

@@ -22,6 +22,9 @@ module.exports = (req, res, next) => {
     } catch (err) {
         console.log('Invalid token!');
         res.locals.isAuthenticated = false;
-        next();
+        if (req._parsedUrl.path.includes('game')) {
+            return res.redirect('/login')
+        }
+        return next();
     }
 };
