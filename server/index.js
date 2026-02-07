@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -6,7 +8,7 @@ const routing = require("./routing");
 const middleware = require("./routing/middleware");
 const app = express();
 const { Server } = require('socket.io');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const { instrument } = require("@socket.io/admin-ui");
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
@@ -14,7 +16,6 @@ const mqttClient = require('./mqttConfig');
 const ranking = require('./ranking');
 const login = require('./routing/login.js');
 const db = require('./db.js');
-require("dotenv").config();
 
 
 const expressServer = app.listen(PORT, '0.0.0.0', () => {
@@ -47,6 +48,13 @@ app.use(express.static(path.join(__dirname, "../client/public")));
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Make API_BASE_URL available to all EJS views
+app.use((req, res, next) => {
+    const apiHost = process.env.API_HOST;
+    res.locals.apiBaseUrl = apiHost ? `http://${apiHost}:${PORT}/api` : '/api';
+    next();
+});
 
 app.use("/api", routing);
 app.use(middleware);

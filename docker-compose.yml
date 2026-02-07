@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - MQTT_BROKER_URL=mqtt://mqtt:1883
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET:-super_secret_key}
+      - PORT=3000
+    depends_on:
+      mqtt:
+        condition: service_started
+    volumes:
+      - app-data:/app/server/data
+    restart: unless-stopped
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mqtt-data:/mosquitto/data
+      - mqtt-log:/mosquitto/log
+    restart: unless-stopped
+
+volumes:
+  app-data:
+  mqtt-data:
+  mqtt-log:

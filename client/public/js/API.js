@@ -1,5 +1,5 @@
 let API = {
-    api: axios.create({ baseURL: "https://192.168.0.130/api" }),
+    api: axios.create({ baseURL: window.API_BASE_URL || "/api" }),
     getGame: function(id) {
         return this.api.get(`/game/${id}`)
             .then(response => response.data)
